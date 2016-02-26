@@ -1,0 +1,49 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/Windows
+/intermediateDir:obj/Windows
+/platform:Windows
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+/reference:..\..\MyContentPipeline\bin\Debug\MyContentPipeline.dll
+
+#---------------------------------- Content ---------------------------------#
+
+#begin Graphics/Backgrounds/nagi-no-asukara-miuna-mother.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:TextureFormat=Color
+/build:Graphics/Backgrounds/nagi-no-asukara-miuna-mother.png
+
+#begin XMLContent/Scenes/XMLFile1.xml
+/importer:XmlSourceImporter
+/processor:XmlSourceProcessor
+/build:XMLContent/Scenes/XMLFile1.xml
+
+#begin Fonts/RegularFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/RegularFont.spritefont
+
+#begin Graphics/Backgrounds/truetearscar.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:TextureFormat=Color
+/build:Graphics/Backgrounds/truetearscar.jpg
+

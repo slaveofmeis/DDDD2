@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="XmlSource">
+    <Item>
+      <SceneNumber>1</SceneNumber>
+      <MainDialogue>Here</MainDialogue>
+    </Item>
+    <Item>
+      <SceneNumber>2</SceneNumber>
+      <MainDialogue>Here2</MainDialogue>
+    </Item>
+  </Asset>
+</XnaContent>
