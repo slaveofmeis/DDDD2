@@ -13,11 +13,16 @@ namespace DDDD2.GameScreens
         ScreenManager manager;
         SpriteFont font;
         BackgroundComponent background;
+        public static string HERO_NAME = "Alan";
+        public static DialogueManager dialogueManager;
+
+
         public GamePlayScreen(Game game, ScreenManager manager)
             : base(game)
         {
             Content = Game.Content;
             this.manager = manager;
+            dialogueManager = new DialogueManager(game);
         }
 
         protected override void LoadContent()
@@ -26,6 +31,7 @@ namespace DDDD2.GameScreens
             background = new BackgroundComponent(
             GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/truetearscar"),
             DrawMode.Fill);
+            dialogueManager.LoadContent();
             base.LoadContent();
         }
 
@@ -35,9 +41,24 @@ namespace DDDD2.GameScreens
             {
                 manager.ChangeScreens(GameRef.startScreen);
             }
-            if (InputManager.KeyReleased(Keys.A) && screenFader.IsFadeOut == false && screenFader.IsFadeIn == false)
+
+            if (screenFader.IsFadeOut == false && screenFader.IsFadeIn == false)
             {
-                screenFader.IsFadeOut = true;
+                dialogueManager.Update(gameTime);
+                if (InputManager.KeyReleased(Keys.A) && dialogueManager.DialogueCount == 0)
+                {
+                    Game1.audioManager.PlayMapSwitch("MagicalOverdrive");
+                    screenFader.IsFadeOut = true;
+                }
+                if (InputManager.KeyReleased(Keys.B))
+                {
+                    dialogueManager.ShowNPCDialogue("Barnsy", "hello. this is test.", false);
+                }
+                if (InputManager.KeyReleased(Keys.C))
+                {
+                    dialogueManager.ShowNPCDialogue("Barnsy", "Gained 1", true);
+                    //dialogueManager.ShowEventDialogue("hello. this is a test^please refrain from being fdsaaaddddddddddddddddddddddddddddddddddddd^ THIS IS A TES TI REPAT A TEST!!", 0);
+                }
             }
             base.Update(gameTime);
         }
@@ -45,6 +66,7 @@ namespace DDDD2.GameScreens
         public override void Draw(GameTime gameTime)
         {
             background.Draw(Game1.spriteBatch);
+            dialogueManager.Draw(Game1.spriteBatch);
             base.Draw(gameTime);
         }
     }

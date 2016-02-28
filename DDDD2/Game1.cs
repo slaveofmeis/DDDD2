@@ -16,11 +16,17 @@ namespace DDDD2
     {
         GraphicsDeviceManager graphics;
         public static SpriteBatch spriteBatch;
-        private SpriteFont font;
+        public static AudioManager audioManager;
+        
         XmlDocument xd;
         ScreenManager screenManager;
         public StartScreen startScreen;
         public GamePlayScreen gamePlayScreen;
+
+        // Common stuff here TODO: put in some separate class/library
+        private SpriteFont font;
+        public static Texture2D pointerTexture;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -35,7 +41,9 @@ namespace DDDD2
             Components.Add(screenManager);
             startScreen = new StartScreen(this, screenManager);
             gamePlayScreen = new GamePlayScreen(this, screenManager);
+            audioManager = new AudioManager(this);
             screenManager.ChangeScreens(startScreen);
+            
         }
 
         public static int Height
@@ -79,6 +87,7 @@ namespace DDDD2
             //Content.Load<SceneData>("XMLContent/Scenes/XMLFile1");
             XmlSource xs = Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1");
             font = Content.Load<SpriteFont>("Fonts/RegularFont");
+            pointerTexture = Content.Load<Texture2D>("Graphics/UI/pointer");
             xd = new XmlDocument();
             xd.LoadXml(xs.XmlCode);
             XmlNodeList elemList = xd.GetElementsByTagName("Item");
@@ -89,6 +98,7 @@ namespace DDDD2
                 Console.WriteLine("SCENENUMBER:" + elemList[i].SelectSingleNode("SceneNumber").InnerText);
                 Console.WriteLine("MAINDIALOGUE:" + elemList[i].SelectSingleNode("MainDialogue").InnerText);
             }
+            audioManager.LoadContent();
             // TODO: use this.Content to load your game content here
         }
 
@@ -109,7 +119,9 @@ namespace DDDD2
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape) || startScreen.gotExit() == 1)
+            audioManager.Update();
+            //TODO gamepad GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) || startScreen.gotExit() == 1)
                 Exit();
 
             // TODO: Add your update logic here

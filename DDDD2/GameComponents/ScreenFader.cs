@@ -167,6 +167,7 @@ namespace DDDD2.GameComponents
         {
             TransitionValue = 255;
             IsFadeIn = true;
+            SwitchOK = false;
         }
 
         public void Draw()
