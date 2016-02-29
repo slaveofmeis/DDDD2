@@ -1,13 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+<SceneNumber>
+<Background>
+<Sprite>
+<MainDialogue>
+<Choice>
+<AttributeModify>
+<AttributeFork>
+<NextScene>
+-->
 <XnaContent>
   <Asset Type="XmlSource">
     <Item>
+      <SceneNumber>0</SceneNumber>
+      <Background>Room</Background>
+      <Sprite></Sprite>
+      <MainDialogue>
+        Here lies test.
+        Test test test.^I am a test. So many tests.
+        So many tests.
+      </MainDialogue>
+      <Choice></Choice>
+      <Choice></Choice>
+      <AttributeModify>fdasfdsa</AttributeModify>
+      <AttributeFork></AttributeFork>
+      <NextScene>2</NextScene>
+    </Item>
+    <Item>
       <SceneNumber>1</SceneNumber>
-      <MainDialogue>Here</MainDialogue>
+      <Background>Room</Background>
+      <Sprite></Sprite>
+      <MainDialogue>Here lies test. 
+      Test test test.^I am a test. So many tests.
+      So many tests.
+      </MainDialogue>
+      <Choice></Choice>
+      <Choice></Choice>
+      <AttributeModify></AttributeModify>
+      <AttributeFork></AttributeFork>
+      <NextScene>2</NextScene>
     </Item>
     <Item>
       <SceneNumber>2</SceneNumber>
-      <MainDialogue>Here2</MainDialogue>
+      <Background>Room</Background>
+      <Sprite>Ellie</Sprite>
+      <MainDialogue>
+        Choice test.
+      </MainDialogue>
+      <Choice>Choice 1 | 4</Choice>
+      <Choice>Choice 2 | 3</Choice>
+      <AttributeModify></AttributeModify>
+      <AttributeFork></AttributeFork>
+      <NextScene></NextScene>
+    </Item>
+    <Item>
+      <SceneNumber>3</SceneNumber>
+      <Background>Room</Background>
+      <Sprite>Ellie</Sprite>
+      <MainDialogue>
+        Attribute test.
+      </MainDialogue>
+      <AttributeModify>2 Strength</AttributeModify>
+      <AttributeFork></AttributeFork>
+      <NextScene>5</NextScene>
+    </Item>
+    <Item>
+      <SceneNumber>4</SceneNumber>
+      <Background>Room</Background>
+      <Sprite>Ellie</Sprite>
+      <MainDialogue>
+        Attribute Fork.
+      </MainDialogue>
+      <AttributeModify>2 Strength</AttributeModify>
+      <AttributeFork>2 Strength 5 6</AttributeFork>
+      <NextScene></NextScene>
     </Item>
   </Asset>
 </XnaContent>

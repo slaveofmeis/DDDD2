@@ -21,7 +21,7 @@ namespace DDDD2.GameComponents
         SpriteFont dialogueFont, identifierFont;
         List<String> dialogue;
         Rectangle dialogueRectangle;
-        Rectangle portraitRectangle;
+        //Rectangle portraitRectangle;
         string identifier = "";
         string tempString = "";
         private int TEXTPADDING;
@@ -39,9 +39,10 @@ namespace DDDD2.GameComponents
         private string shownString = "";
         private bool scrollFinished = false;
         private bool updateLock = false;
-        int dialogueCount = 0;
+        private Queue<Tuple<string, string, bool>> dialogueQueue;
         Game myGame;
-        Texture2D portraitBorderTexture, portraitTexture, dialogueTexture, dialogueBorderTexture;
+        Texture2D dialogueTexture;
+        //Texture2D portraitBorderTexture, portraitTexture, dialogueTexture, dialogueBorderTexture;
         public DialogueManager(Game game)
             : base(game)
         {
@@ -73,6 +74,7 @@ namespace DDDD2.GameComponents
             identifierPosY = DIALOGUEPOSY + TEXTPADDING;
             itemDialogue = false;
             scrollWatch = new Stopwatch();
+            dialogueQueue = new Queue<Tuple<string, string, bool>>();
         }
 
         public bool DrawDialogue
@@ -84,12 +86,6 @@ namespace DDDD2.GameComponents
         public bool DrawPortrait
         {
             get { return drawPortrait; }
-        }
-
-        public int DialogueCount
-        {
-            get { return dialogueCount; }
-            set { dialogueCount = value; }
         }
 
         public List<String> DialogueList
@@ -131,6 +127,16 @@ namespace DDDD2.GameComponents
         public override void Update(GameTime gameTime)
         {
             // TODO: Add your update code here
+            if(dialogueQueue.Count != 0 && dialogue.Count == 0)
+            {
+                Tuple<string, string, bool> t = dialogueQueue.Dequeue();
+                this.identifier = t.Item1.Replace("Alan", GamePlayScreen.HERO_NAME);
+
+                this.itemDialogue = t.Item3;
+                drawDialogue = true;
+                string[] tempArray = t.Item2.Replace("Alan", GamePlayScreen.HERO_NAME).Split('^');
+                ParseDialogue(tempArray);
+            }
             if (dialogue.Count != 0)
             {
                 /*if (!scrollWatch.IsRunning)
@@ -164,17 +170,36 @@ namespace DDDD2.GameComponents
                         }
                     }
                  }
-              }
-                    /*if (dialogue.Count == 0)
+                if (InputManager.KeyReleased(Keys.B))
+                {
+                    if (scrollFinished)
                     {
-                        scrollFinished = true;
-                        //scrollWatch.Stop();
-                        //scrollWatch.Reset();
+                        shownString = "";
+                        dialogue.RemoveAt(0);
                     }
-                    else if(dialogue.Count == 1 && dialogue[0].Equals(""))
+                    else
                     {
-                        scrollFinished = true;
-                    }*/
+                        updateLock = true;
+                        shownString += dialogue[0];
+                        dialogue[0] = "";
+                        updateLock = false;
+                    }
+                }
+            }
+            if (dialogue.Count == 0)
+            {
+                drawDialogue = false;
+            }
+            /*if (dialogue.Count == 0)
+            {
+                scrollFinished = true;
+                //scrollWatch.Stop();
+                //scrollWatch.Reset();
+            }
+            else if(dialogue.Count == 1 && dialogue[0].Equals(""))
+            {
+                scrollFinished = true;
+            }*/
             base.Update(gameTime);
         }
 
@@ -216,36 +241,17 @@ namespace DDDD2.GameComponents
 
         public void ShowNPCDialogue(string identifier, string rawDialogue, bool itemDialogue)
         {
-            this.itemDialogue = itemDialogue;
-            this.identifier = identifier.Replace("Alan", GamePlayScreen.HERO_NAME);
-            drawDialogue = true;
-            dialogueCount++;
-            if (dialogue.Count == 0)
-            {
-                string[] tempArray = rawDialogue.Replace("Alan", GamePlayScreen.HERO_NAME).Split('^');
-                ParseDialogue(tempArray);
+            dialogueQueue.Enqueue(new Tuple<string,string,bool>(identifier, rawDialogue, itemDialogue));
+        }
 
+        public bool hasJobsLeft()
+        {
+            if (dialogueQueue.Count == 0 && dialogue.Count == 0)
+            {
+                return false;
             }
             else
-            {
-                if (scrollFinished)
-                {
-                    shownString = "";
-                    dialogue.RemoveAt(0);
-                }
-                else
-                {
-                    updateLock = true;
-                    shownString += dialogue[0];
-                    dialogue[0] = "";
-                    updateLock = false;
-                }
-            }
-            if (dialogue.Count == 0)
-            {
-                drawDialogue = false;
-                dialogueCount = 0;
-            }
+                return true;
         }
 
         public void Draw(SpriteBatch spriteBatch)

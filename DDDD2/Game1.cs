@@ -7,6 +7,7 @@ using System;
 using System.Xml;
 using DDDD2.GameComponents;
 using DDDD2.GameScreens;
+using DDDD2.GameInformation;
 namespace DDDD2
 {
     /// <summary>
@@ -17,8 +18,8 @@ namespace DDDD2
         GraphicsDeviceManager graphics;
         public static SpriteBatch spriteBatch;
         public static AudioManager audioManager;
+        public static GameInfo gameInfo;
         
-        XmlDocument xd;
         ScreenManager screenManager;
         public StartScreen startScreen;
         public GamePlayScreen gamePlayScreen;
@@ -42,6 +43,7 @@ namespace DDDD2
             startScreen = new StartScreen(this, screenManager);
             gamePlayScreen = new GamePlayScreen(this, screenManager);
             audioManager = new AudioManager(this);
+            gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
             
         }
@@ -85,19 +87,11 @@ namespace DDDD2
             
             //texture = Content.Load<Texture2D>("Graphics/Backgrounds/nagi-no-asukara-miuna-mother");
             //Content.Load<SceneData>("XMLContent/Scenes/XMLFile1");
-            XmlSource xs = Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1");
+
             font = Content.Load<SpriteFont>("Fonts/RegularFont");
             pointerTexture = Content.Load<Texture2D>("Graphics/UI/pointer");
-            xd = new XmlDocument();
-            xd.LoadXml(xs.XmlCode);
-            XmlNodeList elemList = xd.GetElementsByTagName("Item");
-            for (int i=0; i < elemList.Count; i++)
-            {
-                //xd.LoadXml("<Item>"+elemList[i].InnerXml+"</Item>");
-                //XmlNodeList subList = xd.GetElementsByTagName("SceneNumber");
-                Console.WriteLine("SCENENUMBER:" + elemList[i].SelectSingleNode("SceneNumber").InnerText);
-                Console.WriteLine("MAINDIALOGUE:" + elemList[i].SelectSingleNode("MainDialogue").InnerText);
-            }
+            gameInfo.parseScenes(Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1"));
+            
             audioManager.LoadContent();
             // TODO: use this.Content to load your game content here
         }
@@ -121,6 +115,7 @@ namespace DDDD2
         {
             audioManager.Update();
             //TODO gamepad GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
+            // TODO: exit from menu, exit from startscreen
             if (Keyboard.GetState().IsKeyDown(Keys.Escape) || startScreen.gotExit() == 1)
                 Exit();
 
@@ -138,8 +133,6 @@ namespace DDDD2
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            //spriteBatch.Draw(texture, screenRectangle, Color.White);
-            spriteBatch.DrawString(font, "Game1.cs", Vector2.Zero, Color.Yellow);
             base.Draw(gameTime);
             //spriteBatch.Draw(safeTexture, safeArea, Color.White);
             spriteBatch.End();
