@@ -111,7 +111,7 @@ namespace DDDD2.GameComponents
         }
         #endregion
         #region Method Region
-        public void SetPostion(Vector2 position)
+        public void SetPosition(Vector2 position)
         {
             this.position = position;
         }
@@ -167,8 +167,8 @@ namespace DDDD2.GameComponents
                 InputManager.KeyDirectionPressed(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.DPadDown))) */
                     Game1.audioManager.PlayNavSound();
                 }
-            if (InputManager.KeyReleased(Keys.B) || InputManager.KeyReleased(Keys.Escape)) //|| InputManager.ButtonReleased(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.B))
-                    Game1.audioManager.PlayBackSound();
+            //if (InputManager.KeyReleased(Keys.B) || InputManager.KeyReleased(Keys.Escape)) //|| InputManager.ButtonReleased(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.B))
+                    //Game1.audioManager.PlayBackSound();
         }
         public virtual void Draw(SpriteBatch spriteBatch, int lineSpacing, bool alwaysHighlight)
         {

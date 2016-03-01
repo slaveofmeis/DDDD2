@@ -34,7 +34,7 @@ namespace DDDD2.GameScreens
 
             menu = new MenuComponent(font, 0);
             Vector2 menuPosition = new Vector2((Game1.Width - menu.Width) / 2,(Game1.Height - menu.Height) / 2);
-            menu.SetPostion(menuPosition);
+            menu.SetPosition(menuPosition);
             base.LoadContent();
         }
 

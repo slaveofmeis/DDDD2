@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Storage;
 using DDDD2.GameScreens;
 using System.Diagnostics;
+using DDDD2.GameComponents;
 
 namespace DDDD2.GameComponents
 {
@@ -20,7 +21,7 @@ namespace DDDD2.GameComponents
         bool drawDialogue, drawPortrait;
         SpriteFont dialogueFont, identifierFont;
         List<String> dialogue;
-        Rectangle dialogueRectangle;
+        Rectangle dialogueRectangle, narrationDialogueRectangle;
         //Rectangle portraitRectangle;
         string identifier = "";
         string tempString = "";
@@ -31,17 +32,20 @@ namespace DDDD2.GameComponents
         private int DIALOGUEPOSY;
         private int PORTRAITHEIGHT;
         private int PORTRAITWIDTH;
+        private int NARRATIONPOSY;
+
         private const int SCROLL_SPEED = 0;
-        private bool itemDialogue;
         private int portraitPosX, portraitPosY, textPosX, textPosY,
             identifierPosX, identifierPosY;
         private Stopwatch scrollWatch;
         private string shownString = "";
         private bool scrollFinished = false;
         private bool updateLock = false;
-        private Queue<Tuple<string, string, bool>> dialogueQueue;
+        private Queue<Tuple<string, DialogueEnum>> dialogueQueue;
+        private List<string> choiceValues;
+        public enum DialogueEnum {  Normal, Attribute, Choice };
         Game myGame;
-        Texture2D dialogueTexture;
+        Texture2D dialogueTexture, altDialogueTexture;
         //Texture2D portraitBorderTexture, portraitTexture, dialogueTexture, dialogueBorderTexture;
         public DialogueManager(Game game)
             : base(game)
@@ -72,15 +76,31 @@ namespace DDDD2.GameComponents
             identifierPosX = DIALOGUEPOSX + TEXTPADDING * 2;
             textPosY = DIALOGUEPOSY + TEXTPADDING * 6;
             identifierPosY = DIALOGUEPOSY + TEXTPADDING;
-            itemDialogue = false;
             scrollWatch = new Stopwatch();
-            dialogueQueue = new Queue<Tuple<string, string, bool>>();
+            dialogueQueue = new Queue<Tuple<string, DialogueEnum>>();
+            choiceValues = new List<string>();
+            NARRATIONPOSY = (int)(Game1.Height * 0.10) + 4 * TEXTPADDING;
+        }
+
+        public MenuComponent ChoiceMenu
+        {
+            get; set;
+        }
+
+        public List<string> ChoiceValues
+        {
+            get { return choiceValues; }
         }
 
         public bool DrawDialogue
         {
             get { return drawDialogue; }
             set { drawDialogue = value; }
+        }
+
+        public DialogueEnum DialogueType
+        {
+            get; set;
         }
 
         public bool DrawPortrait
@@ -109,33 +129,63 @@ namespace DDDD2.GameComponents
         {
             identifierFont = Game.Content.Load<SpriteFont>("Fonts/menuFont");
             dialogueFont = Game.Content.Load<SpriteFont>("Fonts/dialogueFont");
+            ChoiceMenu = new MenuComponent(dialogueFont, 0);
             //TODO: REVISIT FOR AESTHETICS
             //dialogueBorderTexture = Game.Content.Load<Texture2D>(@"Sprites\UI\dialogueBorder");
             //portraitBorderTexture = Game.Content.Load<Texture2D>(@"Backgrounds\portrait");
             dialogueTexture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            altDialogueTexture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             //dialogueTexture.SetData<Color>(new Color[] { new Color(0, 58, 73, 140) });
             dialogueTexture.SetData<Color>(new Color[] { new Color(0, 0, 30, 125) });
+            altDialogueTexture.SetData<Color>(new Color[] { new Color(0, 0, 0, 125) });
             dialogueRectangle = new Rectangle(DIALOGUEPOSX, DIALOGUEPOSY, DIALOGUEWIDTH, DIALOGUEHEIGHT);
+            narrationDialogueRectangle = new Rectangle(DIALOGUEPOSX, (int)(Game1.Height * 0.10), DIALOGUEWIDTH, (int)(Game1.Height * 0.80));
             //portraitRectangle = new Rectangle(portraitPosX, portraitPosY, PORTRAITWIDTH, PORTRAITHEIGHT);
         }
 
-
+        public void ClearChoices()
+        {
+            ChoiceValues.Clear();
+            ChoiceMenu.MenuItems.Clear();
+        }
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
+            if (ChoiceMenu.MenuItems.Count != 0)
+            {
+                ChoiceMenu.Update();
+                ChoiceMenu.SetPosition(new Vector2(textPosX + 4*TEXTPADDING, textPosY + (int)dialogueFont.MeasureString(dialogue[0]).Y + TEXTPADDING));
+            }
             // TODO: Add your update code here
             if(dialogueQueue.Count != 0 && dialogue.Count == 0)
             {
-                Tuple<string, string, bool> t = dialogueQueue.Dequeue();
-                this.identifier = t.Item1.Replace("Alan", GamePlayScreen.HERO_NAME);
-
-                this.itemDialogue = t.Item3;
+                Tuple<string, DialogueEnum> t = dialogueQueue.Dequeue();
+                DialogueType = t.Item2;
                 drawDialogue = true;
-                string[] tempArray = t.Item2.Replace("Alan", GamePlayScreen.HERO_NAME).Split('^');
-                ParseDialogue(tempArray);
+                string[] tempArray = t.Item1.Replace("Alan", GamePlayScreen.HERO_NAME).Split('^');
+                if (DialogueType != DialogueEnum.Choice)
+                {
+                    ParseDialogue(tempArray);
+                }
+                else
+                {
+                    // Setting up the choices
+                    ParseDialogue(tempArray[0].Split('^'));
+                    List<string> choiceText = new List<string>();
+                    for (int i = 1; i < tempArray.Count(); i++)
+                    {
+                        if (!tempArray[i].Equals(""))
+                        {
+                            //Console.WriteLine(s.Trim());
+                            choiceText.Add(tempArray[i].Split('|')[0].Trim());
+                            choiceValues.Add(tempArray[i].Split('|')[1].Trim());
+                        }
+                    }
+                    ChoiceMenu.SetMenuItems(choiceText);
+                }
             }
             if (dialogue.Count != 0)
             {
@@ -151,18 +201,26 @@ namespace DDDD2.GameComponents
                 }
                 else
                 {
-                    if (itemDialogue)
+                    if (DialogueType == DialogueEnum.Attribute || DialogueType == DialogueEnum.Choice) //no scrolling
                     {
-                        shownString = dialogue[0];
+                        if (DialogueType == DialogueEnum.Attribute) { shownString = "Gained " + dialogue[0].Trim() + "!"; }
+                        else { shownString = dialogue[0].Trim(); }
                         dialogue[0] = "";
                     }
-                    else
+                    else // scrolling
                     { 
                         scrollFinished = false;
                         if (!updateLock)
                         {
                             //if (scrollWatch.ElapsedMilliseconds > SCROLL_SPEED)
                             //{
+                            if (dialogue[0].Contains('|') && identifier.Equals(""))
+                            {
+                                // Extract the identifier, this seems to be a very shitty solution
+                                int index = dialogue[0].IndexOf('|');
+                                identifier = dialogue[0].Split('|')[0];
+                                dialogue[0] = dialogue[0].Remove(0, index+1).Trim();
+                            }
                             shownString += dialogue[0][0];
                             dialogue[0] = dialogue[0].Remove(0, 1);
                             //scrollWatch.Reset();
@@ -176,6 +234,7 @@ namespace DDDD2.GameComponents
                     {
                         shownString = "";
                         dialogue.RemoveAt(0);
+                        identifier = "";
                     }
                     else
                     {
@@ -239,9 +298,9 @@ namespace DDDD2.GameComponents
             }
         }
 
-        public void ShowNPCDialogue(string identifier, string rawDialogue, bool itemDialogue)
+        public void ShowNPCDialogue(string rawDialogue, DialogueEnum dialogueType)
         {
-            dialogueQueue.Enqueue(new Tuple<string,string,bool>(identifier, rawDialogue, itemDialogue));
+            dialogueQueue.Enqueue(new Tuple<string,DialogueEnum>(rawDialogue, dialogueType));
         }
 
         public bool hasJobsLeft()
@@ -258,13 +317,13 @@ namespace DDDD2.GameComponents
         {
             if (drawDialogue == true)
             {
-                if (itemDialogue)
+                if (DialogueType == DialogueEnum.Attribute)
                 {
                     Rectangle itemRectangle = new Rectangle(
                         ((int)(Game1.Width -
                         dialogueFont.MeasureString(shownString).X) / 2) - TEXTPADDING,
                         ((int)Game1.Height - TEXTPADDING) / 2,
-                        (int)dialogueFont.MeasureString(shownString).X + TEXTPADDING,
+                        (int)dialogueFont.MeasureString(shownString).X + 2*TEXTPADDING,
                         (int)dialogueFont.MeasureString(shownString).Y + TEXTPADDING);
                     Game1.spriteBatch.Draw(dialogueTexture, itemRectangle, Color.White);
                     //Game1.spriteBatch.Draw(portraitBorderTexture, itemRectangle, Color.White);
@@ -275,17 +334,35 @@ namespace DDDD2.GameComponents
                 }
                 else
                 {
-                    
-                    Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
-                    //Game1.spriteBatch.Draw(dialogueBorderTexture, dialogueRectangle, Color.White);
-                    //Game1.spriteBatch.DrawString(dialogueFont, dialogue.Count.ToString(), Vector2.Zero, Color.White);
-                    if (!identifier.Contains("NPC") && !identifier.Equals(""))
-                    {
-                        Game1.spriteBatch.DrawString(identifierFont, identifier.ToUpper(), new Vector2(identifierPosX, identifierPosY), Color.White);
-                        Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(textPosX, textPosY), Color.White);
+                   // if (!identifier.Equals(""))
+                   // {
+                        if (identifier.Equals("Thought!"))
+                        {
+                            Game1.spriteBatch.Draw(altDialogueTexture, dialogueRectangle, Color.White);
+                            Game1.spriteBatch.DrawString(dialogueFont, "( " + shownString + " )", new Vector2(identifierPosX, identifierPosY+TEXTPADDING), Color.White);
+                        }
+                        else if (identifier.Equals("Narrator!"))
+                        {
+                            Game1.spriteBatch.Draw(altDialogueTexture, narrationDialogueRectangle, Color.White);
+                            Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + TEXTPADDING, NARRATIONPOSY), Color.White);
+                        }
+                        else if (identifier.Equals(""))
+                        {
+                            Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
+                            Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX, identifierPosY + TEXTPADDING), Color.White);
                     }
-                    else
-                        Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + TEXTPADDING, identifierPosY + TEXTPADDING), Color.White);
+                        else
+                        {
+                            Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
+                            Game1.spriteBatch.DrawString(identifierFont, identifier, new Vector2(identifierPosX, identifierPosY), Color.White);
+                            Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + 2*TEXTPADDING, identifierPosY + 5*TEXTPADDING), Color.White);
+                        }
+                   // }
+                    //Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
+                   // Game1.spriteBatch.DrawString(identifierFont, identifier, new Vector2(identifierPosX, identifierPosY), Color.White);
+                    //Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + 2 * TEXTPADDING, identifierPosY + 5 * TEXTPADDING), Color.White);
+                    if (ChoiceMenu.MenuItems.Count != 0)
+                        ChoiceMenu.Draw(Game1.spriteBatch, TEXTPADDING * 4, true);
                 }
             }
             //Game1.spriteBatch.DrawString(identifierFont, TEXTPADDING.ToString(), Vector2.Zero, Color.White);

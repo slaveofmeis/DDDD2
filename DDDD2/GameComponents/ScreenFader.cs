@@ -14,7 +14,7 @@ namespace DDDD2.GameComponents
 {
     public class ScreenFader
     {
-        public static int DEFAULT_SPEED = 20;
+        public static int DEFAULT_SPEED = 10;
         public static int SLOW_SPEED = 2;
         bool isFadeOut, isFadeIn;
         Texture2D transitionTexture;

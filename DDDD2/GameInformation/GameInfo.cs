@@ -9,34 +9,32 @@ namespace DDDD2.GameInformation
 {
     public class GameInfo
     {
-        private Dictionary<string, int> affectionDict;
-        private Dictionary<int, Scene> sceneDict;
+        private Dictionary<string, int> statsDict;
+        private Dictionary<string, Scene> sceneDict;
         private XmlDocument xd;
 
         public GameInfo()
         {
-            Strength = 0;
-            Intelligence = 0;
-            Charisma = 0;
-            affectionDict = new Dictionary<string, int>();
-            sceneDict = new Dictionary<int, Scene>();   
+            statsDict = new Dictionary<string, int>();
+            sceneDict = new Dictionary<string, Scene>();   
         }
-
-        public int Strength { get; set; }
-        public int Intelligence { get; set; }
-        public int Charisma { get; set; }
 
         public void LoadContent()
         {
 
         }
 
-        public Dictionary<string, int> getAffectionDict()
+        public Dictionary<string, int> getStatsDict()
         {
-            return affectionDict;
+            return statsDict;
+        }
+        
+        public void resetStats()
+        {
+            statsDict.Clear();
         }        
 
-        public Dictionary<int, Scene> getSceneDict()
+        public Dictionary<string, Scene> getSceneDict()
         {
             return sceneDict;
         }
@@ -51,27 +49,37 @@ namespace DDDD2.GameInformation
                 Scene s = new Scene();
                 //xd.LoadXml("<Item>"+elemList[i].InnerXml+"</Item>");
                 //XmlNodeList subList = xd.GetElementsByTagName("SceneNumber");
-                s.SceneNumber = Int32.Parse(elemList[i].SelectSingleNode("SceneNumber").InnerText.Trim());
+                s.SceneId = elemList[i].SelectSingleNode("SceneNumber").InnerText.Trim();
                 s.Background = elemList[i].SelectSingleNode("Background").InnerText.Trim();
                 s.Sprite = elemList[i].SelectSingleNode("Sprite").InnerText.Trim();
                 s.MainDialogue = elemList[i].SelectSingleNode("MainDialogue").InnerText.Trim().Replace('\n', '^');
-                XmlNodeList choiceList = elemList[i].SelectNodes("Choice");
-                foreach (XmlNode n in choiceList)
+                if (elemList[i].SelectSingleNode("ChoiceText") != null)
                 {
-                    if (n.InnerText.Trim().Equals(""))
+                    XmlNodeList choiceList = elemList[i].SelectNodes("Choice");
+                    if (!elemList[i].SelectSingleNode("ChoiceText").InnerText.Trim().Equals(""))
                     {
+                        s.Choices += elemList[i].SelectSingleNode("ChoiceText").InnerText.Trim() + "^";
                     }
-                    else
+                    for (int j = 0; j < choiceList.Count; j++)
                     {
-                        string[] splitArray = n.InnerText.Split('|');
-                        s.ChoiceList.Add(new Tuple<string,int>(splitArray[0].Trim(), Int32.Parse(splitArray[1].Trim())));
+                        if (choiceList[j].InnerText.Trim().Equals(""))
+                        {
+                        }
+                        else
+                        {
+                            s.Choices += choiceList[j].InnerText;
+                            if (j != choiceList.Count - 1)
+                            {
+                                s.Choices += "^";
+                            }
+                        }
                     }
                 }
                 s.AttributeModify = elemList[i].SelectSingleNode("AttributeModify").InnerText.Trim();
                 s.AttributeFork = elemList[i].SelectSingleNode("AttributeFork").InnerText.Trim();
                 if(!elemList[i].SelectSingleNode("NextScene").InnerText.Trim().Equals(""))
-                    s.NextScene = Int32.Parse(elemList[i].SelectSingleNode("NextScene").InnerText.Trim());
-                sceneDict.Add(s.SceneNumber, s);
+                    s.NextScene = elemList[i].SelectSingleNode("NextScene").InnerText.Trim();
+                sceneDict.Add(s.SceneId, s);
             }
         }
     }

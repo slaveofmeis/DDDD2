@@ -8,13 +8,17 @@ namespace DDDD2.GameInformation
 {
     public class Scene
     {
-        private List<Tuple<string, int>> choiceList;
-
+        private string sprite, choices, attributeModify, attributeFork;
+        private string nextScene;
         public Scene()
         {
-            choiceList = new List<Tuple<string, int>>();
+            sprite = "";
+            choices = "";
+            attributeModify = "";
+            attributeFork = "";
+            nextScene = "-1";
         }
-        public int SceneNumber
+        public string SceneId
         {
             get; set;
         }
@@ -24,30 +28,30 @@ namespace DDDD2.GameInformation
         }
         public string Sprite
         {
-            get; set;
+            get { return sprite; } set { sprite = value; }
         }
         public string MainDialogue
         {
             get; set;
         }
-        public List<Tuple<string, int>> ChoiceList
+        public string Choices
         {
-            get { return choiceList; }
+            get { return choices; } set { choices = value; }
         }
 
         public string AttributeModify
         {
-            get; set;
+            get { return attributeModify; } set { attributeModify = value; }
         }
 
         public string AttributeFork
         {
-            get; set;
+            get { return attributeFork; } set { attributeFork = value; }
         }
 
-        public int NextScene
+        public string NextScene
         {
-            get; set;
+            get { return nextScene; } set { nextScene = value; }
         }
     }
 }
