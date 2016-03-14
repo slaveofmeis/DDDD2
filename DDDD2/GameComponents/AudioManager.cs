@@ -14,7 +14,7 @@ namespace DDDD2.GameComponents
     public class AudioManager
     {
         private const float SOUND_CREMENT_VALUE = 0.0125f;
-        private const float CREMENT_VALUE = 0.01f;
+        private const float CREMENT_VALUE = 0.05f;
         private const float TRANSITION_CREMENT_VALUE = 0.05f;
         // Start Menu Screen?
         
@@ -102,12 +102,12 @@ namespace DDDD2.GameComponents
         public void PlayMapSwitch(string songToPlay)
         {
             //mySong = myGame.Content.Load<Song>("Music\\" + songToPlay);
-            /*if (currentSong.Equals("Music/" + songToPlay) && MediaPlayer.State != MediaState.Stopped && MediaPlayer.State != MediaState.Paused)
+            if (currentSong.Equals("Music/" + songToPlay) && MediaPlayer.State != MediaState.Stopped && MediaPlayer.State != MediaState.Paused)
             {
             }
-            */
-            //else
-            //{
+            
+            else
+            {
                 isSwitchingMap = true;
                 /*MediaPlayer.Resume();
                 MediaPlayer.Play(mySong);
@@ -115,7 +115,7 @@ namespace DDDD2.GameComponents
                 MediaPlayer.Volume = 0f;
                 fakeVolume = 0f;
                 isTransitioning = true;*/
-            //}
+            }
             nextMapSong = songToPlay;
         }
 
@@ -247,6 +247,10 @@ namespace DDDD2.GameComponents
             PlayStaticSound(SWIPE_1);
         }
         */
+        public void fadeMeOut()
+        {
+            isFadeOut = true;
+        }
 
         private void CheckFadeOutSongs()
         {
@@ -314,10 +318,10 @@ namespace DDDD2.GameComponents
             }
             else if (isSwitchingMap)
             {
-                if ((fakeVolume - TRANSITION_CREMENT_VALUE) > 0)
+                if ((fakeVolume - CREMENT_VALUE) > 0)
                 {
-                    MediaPlayer.Volume -= TRANSITION_CREMENT_VALUE;
-                    fakeVolume -= TRANSITION_CREMENT_VALUE;
+                    MediaPlayer.Volume -= CREMENT_VALUE;
+                    fakeVolume -= CREMENT_VALUE;
                 }
                 else
                 {
@@ -335,6 +339,7 @@ namespace DDDD2.GameComponents
                 else
                 {
                     MediaPlayer.Volume = 0;
+                    currentSong = "";
                     MediaPlayer.Stop();
                     isFadeOut = false;
                 }

@@ -14,7 +14,6 @@ namespace DDDD2.GameScreens
         private ScreenManager manager;
         private SpriteFont font;
         private BackgroundComponent background, background2;
-        //texture = Content.Load<Texture2D>("Graphics/Backgrounds/nagi-no-asukara-miuna-mother");
         private MenuComponent menu;
         private string[] menuItems = { "New Game", "Load Game", "Exit" };
         public StartScreen(Game game, ScreenManager manager)
@@ -28,9 +27,9 @@ namespace DDDD2.GameScreens
         {
             font = Content.Load<SpriteFont>("Fonts/RegularFont");
             background = new BackgroundComponent(
-            GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/nagi-no-asukara-miuna-mother"),
+            GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/wizardtower"),
             DrawMode.Fill);
-            Game1.audioManager.Play("MagicalOverdrive");
+            //Game1.audioManager.Play("Home");
 
             menu = new MenuComponent(font, 0);
             Vector2 menuPosition = new Vector2((Game1.Width - menu.Width) / 2,(Game1.Height - menu.Height) / 2);
@@ -49,7 +48,6 @@ namespace DDDD2.GameScreens
                     switch (menu.SelectedIndex)
                     {
                         case 0:
-                            Game1.audioManager.PlayMapSwitch("the_field_of_dreams");
                             Game1.audioManager.PlaySelectSound();
                             manager.ChangeScreens(GameRef.gamePlayScreen);
                             //manager.ChangeScreens(GameRef.nameHeroScreen);
@@ -86,7 +84,7 @@ namespace DDDD2.GameScreens
         public override void Draw(GameTime gameTime)
         {
             background.Draw(Game1.spriteBatch);
-            Game1.spriteBatch.DrawString(font, "StartScreen", new Vector2(100,100), Color.Yellow);
+            //Game1.spriteBatch.DrawString(font, "StartScreen", new Vector2(100,100), Color.Yellow);
             menu.Draw(Game1.spriteBatch, font.LineSpacing, true);
             base.Draw(gameTime);
         }

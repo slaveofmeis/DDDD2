@@ -23,7 +23,10 @@ namespace DDDD2
         ScreenManager screenManager;
         public StartScreen startScreen;
         public GamePlayScreen gamePlayScreen;
-
+        //TODO:
+        // SPACE, volume changer, THE END screen, FONTS
+        // BUGS:
+        // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
         private SpriteFont font;
         public static Texture2D pointerTexture;
@@ -32,8 +35,8 @@ namespace DDDD2
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = 848;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1024;
+            graphics.PreferredBackBufferHeight = 576;
             Width = graphics.PreferredBackBufferWidth;
             Height = graphics.PreferredBackBufferHeight;
 

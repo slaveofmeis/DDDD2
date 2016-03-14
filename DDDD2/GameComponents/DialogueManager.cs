@@ -130,6 +130,7 @@ namespace DDDD2.GameComponents
             identifierFont = Game.Content.Load<SpriteFont>("Fonts/menuFont");
             dialogueFont = Game.Content.Load<SpriteFont>("Fonts/dialogueFont");
             ChoiceMenu = new MenuComponent(dialogueFont, 0);
+            ChoiceMenu.IsVisible = false;
             //TODO: REVISIT FOR AESTHETICS
             //dialogueBorderTexture = Game.Content.Load<Texture2D>(@"Sprites\UI\dialogueBorder");
             //portraitBorderTexture = Game.Content.Load<Texture2D>(@"Backgrounds\portrait");
@@ -147,6 +148,7 @@ namespace DDDD2.GameComponents
         {
             ChoiceValues.Clear();
             ChoiceMenu.MenuItems.Clear();
+            ChoiceMenu.SelectedIndex = 0;
         }
         /// <summary>
         /// Allows the game component to update itself.
@@ -158,6 +160,7 @@ namespace DDDD2.GameComponents
             {
                 ChoiceMenu.Update();
                 ChoiceMenu.SetPosition(new Vector2(textPosX + 4*TEXTPADDING, textPosY + (int)dialogueFont.MeasureString(dialogue[0]).Y + TEXTPADDING));
+                ChoiceMenu.IsVisible = true;
             }
             // TODO: Add your update code here
             if(dialogueQueue.Count != 0 && dialogue.Count == 0)
@@ -206,6 +209,8 @@ namespace DDDD2.GameComponents
                         if (DialogueType == DialogueEnum.Attribute) { shownString = "Gained " + dialogue[0].Trim() + "!"; }
                         else { shownString = dialogue[0].Trim(); }
                         dialogue[0] = "";
+                        if (DialogueType == DialogueEnum.Attribute)
+                            Game1.audioManager.PlayPositiveSound();
                     }
                     else // scrolling
                     { 
@@ -361,7 +366,7 @@ namespace DDDD2.GameComponents
                     //Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
                    // Game1.spriteBatch.DrawString(identifierFont, identifier, new Vector2(identifierPosX, identifierPosY), Color.White);
                     //Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + 2 * TEXTPADDING, identifierPosY + 5 * TEXTPADDING), Color.White);
-                    if (ChoiceMenu.MenuItems.Count != 0)
+                    if (ChoiceMenu.MenuItems.Count != 0 && ChoiceMenu.IsVisible)
                         ChoiceMenu.Draw(Game1.spriteBatch, TEXTPADDING * 4, true);
                 }
             }

@@ -52,6 +52,7 @@ namespace DDDD2.GameInformation
                 s.SceneId = elemList[i].SelectSingleNode("SceneNumber").InnerText.Trim();
                 s.Background = elemList[i].SelectSingleNode("Background").InnerText.Trim();
                 s.Sprite = elemList[i].SelectSingleNode("Sprite").InnerText.Trim();
+                s.Music = elemList[i].SelectSingleNode("Music").InnerText.Trim();
                 s.MainDialogue = elemList[i].SelectSingleNode("MainDialogue").InnerText.Trim().Replace('\n', '^');
                 if (elemList[i].SelectSingleNode("ChoiceText") != null)
                 {

@@ -13,16 +13,22 @@ namespace DDDD2.GameComponents
         Rectangle destination;
         Texture2D image;
         DrawMode drawMode;
+        //string backgroundName;
         public bool Visible
         {
             get;
             set;
         }
+        /*public string Name
+        {
+            get { return backgroundName; }
+        }*/
         public BackgroundComponent(Game game, Texture2D image, DrawMode drawMode)
         {
             Visible = true;
             this.image = image;
             this.drawMode = drawMode;
+            //backgroundName = image.Name;
             screenRectangle = new Rectangle(
             0,
             0,

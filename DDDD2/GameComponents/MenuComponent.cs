@@ -86,6 +86,11 @@ namespace DDDD2.GameComponents
         {
             get { return exit; }
         }
+
+        public bool IsVisible
+        {
+            get; set;
+        }
         #endregion
         #region Constructor Region
         /*public MenuComponent(SpriteFont spriteFont, string[] items)
@@ -106,6 +111,7 @@ namespace DDDD2.GameComponents
             menuItems = new List<String>();
             hasFocus = true;
             highlight = false;
+            IsVisible = true;
             this.menuStatus = menuStatus;
 
         }

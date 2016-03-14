@@ -9,9 +9,10 @@ namespace DDDD2.GameInformation
     public class Scene
     {
         private string sprite, choices, attributeModify, attributeFork;
-        private string nextScene;
+        private string nextScene, music;
         public Scene()
         {
+            music = "";
             sprite = "";
             choices = "";
             attributeModify = "";
@@ -29,6 +30,10 @@ namespace DDDD2.GameInformation
         public string Sprite
         {
             get { return sprite; } set { sprite = value; }
+        }
+        public string Music
+        {
+            get { return music; } set { music = value;  }
         }
         public string MainDialogue
         {

@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using DDDD2.GameComponents;
 using DDDD2.GameInformation;
+using System.IO;
+using System.IO.IsolatedStorage;
 namespace DDDD2.GameScreens
 {
     public class GamePlayScreen : GameScreen
@@ -14,6 +16,7 @@ namespace DDDD2.GameScreens
         ScreenManager manager;
         SpriteFont font;
         BackgroundComponent background;
+        private Texture2D spriteTexture;
         public static string HERO_NAME = "Alan";
         public static DialogueManager dialogueManager;
         private string currentSceneId;
@@ -36,10 +39,9 @@ namespace DDDD2.GameScreens
         protected override void LoadContent()
         {
             font = Content.Load<SpriteFont>("Fonts/RegularFont");
-            background = new BackgroundComponent(
-            GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/truetearscar"),
-            DrawMode.Fill);
             dialogueManager.LoadContent();
+            gameStarted = true;
+            LoadScene();
             base.LoadContent();
         }
 
@@ -50,26 +52,27 @@ namespace DDDD2.GameScreens
             currentSceneId = "0";
         }
 
+        private void handleTransition()
+        {
+            if (currentSceneId.Contains("WC") || currentSceneId.Contains("LC"))
+            {
+                prepNewGame();
+                Game1.audioManager.fadeMeOut();
+                manager.ChangeScreens(GameRef.startScreen);
+            }
+            else
+                LoadScene();
+        }
+
         public override void Update(GameTime gameTime)
         {
             // TODO button instructions
             // TODO MENU
-            if (!gameStarted)
-            {
-                LoadScene();
-            }
 
-            if (screenFader.SwitchOK == true)
+            if (screenFader.SwitchOK == true || !gameStarted)
             {
                 screenFader.FadeMeIn();
-                if (currentSceneId.Contains("WC") || currentSceneId.Contains("LC"))
-                {
-                    prepNewGame();
-                    Game1.audioManager.Play("MagicalOverdrive");
-                    manager.ChangeScreens(GameRef.startScreen);
-                }
-                else
-                    LoadScene();
+                handleTransition();
             }
 
             if (screenFader.IsFadeOut == false && screenFader.IsFadeIn == false)
@@ -77,6 +80,7 @@ namespace DDDD2.GameScreens
                 dialogueManager.Update(gameTime);
                 if (dialogueManager.DialogueList.Count == 0 && !dialogueManager.hasJobsLeft())
                 {
+                    string savedBackground = CurrentScene.Background;
                     // Based on the last dialogue job, see what the next scene is
                     if (dialogueManager.DialogueType == DialogueManager.DialogueEnum.Choice)
                     {
@@ -96,14 +100,77 @@ namespace DDDD2.GameScreens
                             currentSceneId = CurrentScene.NextScene;
                         }
                     }
-
-                    screenFader.IsFadeOut = true;
+                    if (!currentSceneId.Contains("WC") && !currentSceneId.Contains("LC"))
+                    {
+                        if (savedBackground.Equals(CurrentScene.Background))
+                        {
+                            handleTransition();
+                        }
+                        else
+                            screenFader.IsFadeOut = true;
+                    }
+                    else
+                        screenFader.IsFadeOut = true;
+                }
+                if (InputManager.KeyReleased(Keys.G))
+                {
+                    SaveGame();
+                }
+                if (InputManager.KeyReleased(Keys.H))
+                {
+                    LoadGame();
                 }
             }
             base.Update(gameTime);
         }
 
-        private void HandleAttributeFork()
+        private void SaveGame()
+        {
+            string filename = "test.dat";
+            FileStream stream=File.Open(filename, FileMode.OpenOrCreate); 
+            StreamWriter writeStream= new StreamWriter(stream);
+            try
+            {
+                writeStream.WriteLine("ABC");
+            }
+            finally
+            {
+                // Close the file
+                writeStream.Flush();
+                writeStream.Close();
+                stream.Close();
+            }
+            
+        }
+
+        public void LoadGame()
+        {
+            string filename = "test.dat";
+            if (System.IO.File.Exists(filename))
+            {
+                FileStream stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.Read);
+                // create a reader to the stream...
+                StreamReader readStream = new StreamReader(stream);
+                try
+                {
+                    Console.WriteLine(readStream.ReadLine());
+                }
+                finally
+                {
+                    // Tidy up by closing the streams...
+                    readStream.Close();
+                    stream.Close();
+                }
+            }
+            else
+            {
+                // BUZZ
+            }
+
+        }
+    
+
+    private void HandleAttributeFork()
         {
             string[] tempArray = CurrentScene.AttributeFork.Split(' ');
             int attributeValue = Int32.Parse(tempArray[0].Trim());
@@ -141,6 +208,9 @@ namespace DDDD2.GameScreens
         private void LoadScene()
         {
             Console.WriteLine("Loading scene: " + currentSceneId);
+            background = new BackgroundComponent(
+            GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/" + CurrentScene.Background),
+            DrawMode.Fill);
             dialogueManager.ShowNPCDialogue(CurrentScene.MainDialogue, DialogueManager.DialogueEnum.Normal);
             if (!CurrentScene.Choices.Equals(""))
             {
@@ -150,6 +220,21 @@ namespace DDDD2.GameScreens
             {
                 dialogueManager.ShowNPCDialogue(CurrentScene.AttributeModify, DialogueManager.DialogueEnum.Attribute);
             }
+            if (!CurrentScene.Music.Equals(""))
+            {
+                Game1.audioManager.PlayMapSwitch(CurrentScene.Music);
+                Console.WriteLine("Playing: " + CurrentScene.Music);
+            }
+            else
+            {
+                Game1.audioManager.fadeMeOut();
+            }
+            if (!CurrentScene.Sprite.Equals(""))
+            {
+                spriteTexture = Content.Load<Texture2D>("Graphics/Sprites/" + CurrentScene.Sprite);
+            }
+            else
+                spriteTexture = null;
             gameStarted = true;
 
         }
@@ -157,6 +242,10 @@ namespace DDDD2.GameScreens
         public override void Draw(GameTime gameTime)
         {
             background.Draw(Game1.spriteBatch);
+            if(spriteTexture != null) // !CurrentScene.Sprite.Equals("") && 
+            {
+                Game1.spriteBatch.Draw(spriteTexture, Vector2.Zero, Color.White);
+            }
             dialogueManager.Draw(Game1.spriteBatch);
             base.Draw(gameTime);
         }
