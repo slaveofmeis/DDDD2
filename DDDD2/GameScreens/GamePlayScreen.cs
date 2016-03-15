@@ -68,14 +68,17 @@ namespace DDDD2.GameScreens
         {
             // TODO button instructions
             // TODO MENU
-
-            if (screenFader.SwitchOK == true || !gameStarted)
+            if(!gameStarted)
+            {
+                handleTransition();
+            }
+            if (screenFader.SwitchOK == true)
             {
                 screenFader.FadeMeIn();
                 handleTransition();
             }
-
-            if (screenFader.IsFadeOut == false && screenFader.IsFadeIn == false)
+            
+            if (screenFader.IsFadeOut == false && screenFader.IsFadeIn == false && !Game1.audioManager.audioTransitioning())
             {
                 dialogueManager.Update(gameTime);
                 if (dialogueManager.DialogueList.Count == 0 && !dialogueManager.hasJobsLeft())
@@ -119,6 +122,11 @@ namespace DDDD2.GameScreens
                 if (InputManager.KeyReleased(Keys.H))
                 {
                     LoadGame();
+                }
+                if (InputManager.KeyReleased(Keys.V))
+                {
+                    //Console.WriteLine(MediaPlayer.Volume);
+                    //Console.WriteLine(MediaPlayer.State);
                 }
             }
             base.Update(gameTime);

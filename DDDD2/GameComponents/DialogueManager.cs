@@ -79,7 +79,7 @@ namespace DDDD2.GameComponents
             scrollWatch = new Stopwatch();
             dialogueQueue = new Queue<Tuple<string, DialogueEnum>>();
             choiceValues = new List<string>();
-            NARRATIONPOSY = (int)(Game1.Height * 0.10) + 4 * TEXTPADDING;
+            NARRATIONPOSY = (int)(Game1.Height * 0.10) + 2 * TEXTPADDING;
         }
 
         public MenuComponent ChoiceMenu
@@ -206,11 +206,14 @@ namespace DDDD2.GameComponents
                 {
                     if (DialogueType == DialogueEnum.Attribute || DialogueType == DialogueEnum.Choice) //no scrolling
                     {
-                        if (DialogueType == DialogueEnum.Attribute) { shownString = "Gained " + dialogue[0].Trim() + "!"; }
+                        if (DialogueType == DialogueEnum.Attribute && !dialogue[0].Contains("Affection")) // Affection is a hidden stat gain
+                        {
+                            shownString = "Gained " + dialogue[0].Trim() + "!";
+                            Game1.audioManager.PlayPositiveSound();
+
+                        }
                         else { shownString = dialogue[0].Trim(); }
                         dialogue[0] = "";
-                        if (DialogueType == DialogueEnum.Attribute)
-                            Game1.audioManager.PlayPositiveSound();
                     }
                     else // scrolling
                     { 
@@ -233,7 +236,7 @@ namespace DDDD2.GameComponents
                         }
                     }
                  }
-                if (InputManager.KeyReleased(Keys.B))
+                if (InputManager.KeyReleased(Keys.Space))
                 {
                     if (scrollFinished)
                     {

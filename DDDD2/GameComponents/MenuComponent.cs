@@ -160,8 +160,8 @@ namespace DDDD2.GameComponents
         }
         public virtual void HandleMenuSounds()
         {
-                if (menuItems.Count != 0 && (InputManager.KeyDirectionPressed(Keys.Up) || InputManager.KeyDirectionPressed(Keys.Down) ||
-                    InputManager.KeyDirectionPressed(Keys.Left) || InputManager.KeyDirectionPressed(Keys.Right)))
+                if (menuItems.Count != 0 && (InputManager.KeyDirectionPressed(Keys.Up) || InputManager.KeyDirectionPressed(Keys.Down))) //||
+                    //InputManager.KeyDirectionPressed(Keys.Left) || InputManager.KeyDirectionPressed(Keys.Right)))
                 {/*||
                 InputManager.KeyDirectionPressed(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.LeftThumbstickUp) ||
                 InputManager.KeyDirectionPressed(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.DPadUp) ||
@@ -193,7 +193,7 @@ namespace DDDD2.GameComponents
                 menuPosition.Y += lineSpacing;
             }
             if (HasFocus)
-                spriteBatch.Draw(Game1.pointerTexture, new Vector2(position.X - 25, (position.Y + 10) + selectedIndex * lineSpacing), Color.White);
+                spriteBatch.Draw(Game1.pointerTexture, new Vector2(position.X - 25, (position.Y + lineSpacing/3) + selectedIndex * lineSpacing), Color.White);
         }
         #endregion
     }

@@ -17,7 +17,7 @@ namespace DDDD2.GameComponents
         private const float CREMENT_VALUE = 0.05f;
         private const float TRANSITION_CREMENT_VALUE = 0.05f;
         // Start Menu Screen?
-        
+        public float maxVolumeSetting;
         private const string NAVIGATION = "Sounds/sf3_sfx_menu_select";
         private const string SELECT = "Sounds/29929__DJ_Chronos__Menu_Nav_3-2";
         private const string BACK = "Sounds/sf3_sfx_menu_back";
@@ -53,6 +53,30 @@ namespace DDDD2.GameComponents
             fakeVolume = 0;
             fadeOutSounds = new Dictionary<SoundEffectInstance, bool>();
             soundList = new List<SoundEffectInstance>();
+            maxVolumeSetting = 1.0f;
+            MediaPlayer.Volume = maxVolumeSetting;
+        }
+
+        public bool audioTransitioning()
+        {
+            return (isTransitioning || isFadeOut || isPausing || isSwitchingMap);
+        }
+
+        public void incrementMaxVolume()
+        {
+            if (maxVolumeSetting < 1.0f)
+            {
+                maxVolumeSetting += 0.25f;
+                MediaPlayer.Volume = maxVolumeSetting;
+            }
+        }
+        public void decrementMaxVolume()
+        {
+            if (maxVolumeSetting > 0f)
+            {
+                maxVolumeSetting -= 0.25f;
+                MediaPlayer.Volume = maxVolumeSetting;
+            }
         }
 
         public void LoadContent()
@@ -157,7 +181,7 @@ namespace DDDD2.GameComponents
             fadeOutSounds[mySound] = false;
             if (looped && !mySound.IsLooped)
                 mySound.IsLooped = true;
-            mySound.Volume = 0.5f;
+            mySound.Volume = maxVolumeSetting;
             mySound.Play();
         }
         private void StopSound(SoundEffectInstance mySound)
@@ -181,6 +205,7 @@ namespace DDDD2.GameComponents
             aSound.IsLooped = false;
             //aSound.Pitch = 1;
             soundList.Add(aSound);
+            aSound.Volume = maxVolumeSetting;
             aSound.Play();
         }
         public void PlayNavSound()
@@ -304,15 +329,15 @@ namespace DDDD2.GameComponents
             DisposeSounds();
             if (isTransitioning && !isSwitchingMap)
             {
-                if ((fakeVolume + CREMENT_VALUE) < 1)
+                if ((fakeVolume + CREMENT_VALUE) < maxVolumeSetting)
                 {
                     MediaPlayer.Volume += CREMENT_VALUE;
                     fakeVolume += CREMENT_VALUE;
                 }
                 else
                 {
-                    MediaPlayer.Volume = 1;
-                    fakeVolume = 1;
+                    MediaPlayer.Volume = maxVolumeSetting;
+                    fakeVolume = maxVolumeSetting;
                     isTransitioning = false;
                 }
             }

@@ -23,8 +23,9 @@ namespace DDDD2
         ScreenManager screenManager;
         public StartScreen startScreen;
         public GamePlayScreen gamePlayScreen;
+        public NameHeroScreen nameHeroScreen;
         //TODO:
-        // SPACE, volume changer, THE END screen, FONTS
+        // SPACE, volume changer, FONTS, naming screen, title of the thingy, check all sounds credits, check no extra controls, gameplay screen menu
         // BUGS:
         // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
@@ -45,6 +46,7 @@ namespace DDDD2
             Components.Add(screenManager);
             startScreen = new StartScreen(this, screenManager);
             gamePlayScreen = new GamePlayScreen(this, screenManager);
+            nameHeroScreen = new NameHeroScreen(this, screenManager);
             audioManager = new AudioManager(this);
             gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
