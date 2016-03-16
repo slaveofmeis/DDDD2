@@ -168,7 +168,7 @@ namespace DDDD2.GameComponents
                 Tuple<string, DialogueEnum> t = dialogueQueue.Dequeue();
                 DialogueType = t.Item2;
                 drawDialogue = true;
-                string[] tempArray = t.Item1.Replace("Alan", GamePlayScreen.HERO_NAME).Split('^');
+                string[] tempArray = t.Item1.Replace(GamePlayScreen.MC_IDENTIFIER, GamePlayScreen.HERO_NAME).Split('^');
                 if (DialogueType != DialogueEnum.Choice)
                 {
                     ParseDialogue(tempArray);

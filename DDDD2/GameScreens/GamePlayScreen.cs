@@ -9,15 +9,17 @@ using DDDD2.GameComponents;
 using DDDD2.GameInformation;
 using System.IO;
 using System.IO.IsolatedStorage;
+using Microsoft.Xna.Framework.Media;
 namespace DDDD2.GameScreens
 {
     public class GamePlayScreen : GameScreen
     {
         ScreenManager manager;
-        SpriteFont font;
+        //SpriteFont font;
         BackgroundComponent background;
         private Texture2D spriteTexture;
         public static string HERO_NAME = "Alan";
+        public static string MC_IDENTIFIER = "[MC]";
         public static DialogueManager dialogueManager;
         private string currentSceneId;
         private bool gameStarted;
@@ -31,6 +33,11 @@ namespace DDDD2.GameScreens
             gameStarted = false;
         }
 
+        public void setHeroName(string name)
+        {
+            HERO_NAME = name;
+        }
+
         private Scene CurrentScene
         {
             get {  return Game1.gameInfo.getSceneDict()[currentSceneId]; }
@@ -38,7 +45,7 @@ namespace DDDD2.GameScreens
 
         protected override void LoadContent()
         {
-            font = Content.Load<SpriteFont>("Fonts/RegularFont");
+            //font = Content.Load<SpriteFont>("Fonts/RegularFont");
             dialogueManager.LoadContent();
             gameStarted = true;
             LoadScene();
@@ -125,8 +132,8 @@ namespace DDDD2.GameScreens
                 }
                 if (InputManager.KeyReleased(Keys.V))
                 {
-                    //Console.WriteLine(MediaPlayer.Volume);
-                    //Console.WriteLine(MediaPlayer.State);
+                    Console.WriteLine(MediaPlayer.Volume);
+                    Console.WriteLine(MediaPlayer.State);
                 }
             }
             base.Update(gameTime);

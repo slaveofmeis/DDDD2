@@ -17,16 +17,16 @@ namespace DDDD2.GameComponents
     public class MenuComponent
     {
         #region Field and Property Region
-        List<String> menuItems;
-        int selectedIndex;
-        int menuStatus;
-        int exit;
-        float width;
-        float height;
-        bool hasFocus;
-        bool highlight;
-        Vector2 position;
-        SpriteFont spriteFont;
+        protected List<String> menuItems;
+        protected int selectedIndex;
+        protected int menuStatus;
+        protected int exit;
+        protected float width;
+        protected float height;
+        protected bool hasFocus;
+        protected bool highlight;
+        protected Vector2 position;
+        protected SpriteFont spriteFont;
         public Color NormalColor
         {
             get;
@@ -185,7 +185,7 @@ namespace DDDD2.GameComponents
             {
                 // TODO: revisit hero name
                 //string shownString = menuItems[i];
-                string shownString = menuItems[i].Replace("Alan", GamePlayScreen.HERO_NAME);
+                string shownString = menuItems[i].Replace(GamePlayScreen.MC_IDENTIFIER, GamePlayScreen.HERO_NAME);
                 if (i == selectedIndex && (hasFocus == true || highlight == true))
                     spriteBatch.DrawString(spriteFont, shownString, menuPosition, HiliteColor);
                 else

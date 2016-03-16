@@ -15,6 +15,7 @@ namespace DDDD2
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        // I have no idea why these are static while game screens arent
         GraphicsDeviceManager graphics;
         public static SpriteBatch spriteBatch;
         public static AudioManager audioManager;
@@ -25,11 +26,11 @@ namespace DDDD2
         public GamePlayScreen gamePlayScreen;
         public NameHeroScreen nameHeroScreen;
         //TODO:
-        // SPACE, volume changer, FONTS, naming screen, title of the thingy, check all sounds credits, check no extra controls, gameplay screen menu
+        // title of the thingy, check all sounds credits, check no extra controls, gameplay screen menu
         // BUGS:
         // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
-        private SpriteFont font;
+        //private SpriteFont font;
         public static Texture2D pointerTexture;
 
         public Game1()
@@ -93,7 +94,7 @@ namespace DDDD2
             //texture = Content.Load<Texture2D>("Graphics/Backgrounds/nagi-no-asukara-miuna-mother");
             //Content.Load<SceneData>("XMLContent/Scenes/XMLFile1");
 
-            font = Content.Load<SpriteFont>("Fonts/RegularFont");
+            //font = Content.Load<SpriteFont>("Fonts/RegularFont");
             pointerTexture = Content.Load<Texture2D>("Graphics/UI/pointer");
             gameInfo.parseScenes(Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1"));
             

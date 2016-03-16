@@ -26,7 +26,7 @@ namespace DDDD2.GameScreens
 
         protected override void LoadContent()
         {
-            font = Content.Load<SpriteFont>("Fonts/RegularFont");
+            font = Content.Load<SpriteFont>("Fonts/dialogueFont");
             background = new BackgroundComponent(
             GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/StartScreen"),
             DrawMode.Fill);
@@ -59,6 +59,7 @@ namespace DDDD2.GameScreens
                         case 0:
                             Game1.audioManager.PlaySelectSound();
                             //screenFader.IsFadeOut = true;
+                            GameRef.nameHeroScreen.reset();
                             manager.ChangeScreens(GameRef.nameHeroScreen);
                             //manager.ChangeScreens(GameRef.nameHeroScreen);
                             break;
