@@ -359,7 +359,9 @@ namespace DDDD2.GameComponents
                         {
                             Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
                             Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX, identifierPosY + TEXTPADDING), Color.White);
-                        }
+                            if (ChoiceMenu.MenuItems.Count != 0 && ChoiceMenu.IsVisible)
+                                ChoiceMenu.Draw(Game1.spriteBatch, TEXTPADDING * 4, true);
+                    }
                         else if (identifier.Equals("[End]"))
                         {
                             Game1.spriteBatch.Draw(altDialogueTexture, dialogueRectangle, Color.White);
@@ -374,8 +376,7 @@ namespace DDDD2.GameComponents
                         //Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
                         // Game1.spriteBatch.DrawString(identifierFont, identifier, new Vector2(identifierPosX, identifierPosY), Color.White);
                         //Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX + 2 * TEXTPADDING, identifierPosY + 5 * TEXTPADDING), Color.White);
-                        if (ChoiceMenu.MenuItems.Count != 0 && ChoiceMenu.IsVisible)
-                            ChoiceMenu.Draw(Game1.spriteBatch, TEXTPADDING * 4, true);
+                        
                     //}
                 }
             }

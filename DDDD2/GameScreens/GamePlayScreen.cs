@@ -29,7 +29,7 @@ namespace DDDD2.GameScreens
             Content = Game.Content;
             this.manager = manager;
             dialogueManager = new DialogueManager(game);
-            currentSceneId = "0";
+            currentSceneId = "52";
             gameStarted = false;
         }
 

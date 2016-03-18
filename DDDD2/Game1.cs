@@ -8,6 +8,7 @@ using System.Xml;
 using DDDD2.GameComponents;
 using DDDD2.GameScreens;
 using DDDD2.GameInformation;
+using Steamworks;
 namespace DDDD2
 {
     /// <summary>
@@ -26,7 +27,7 @@ namespace DDDD2
         public GamePlayScreen gamePlayScreen;
         public NameHeroScreen nameHeroScreen;
         //TODO:
-        // title of the thingy, check all sounds credits, check no extra controls, gameplay screen menu
+        // check all sounds credits, check no extra controls, gameplay screen menu, ENDING screen
         // BUGS:
         // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
@@ -35,13 +36,16 @@ namespace DDDD2
 
         public Game1()
         {
+            //bool steamInit = SteamAPI.Init();
+            //Console.WriteLine(SteamFriends.GetPersonaName());
+            
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 576;
             Width = graphics.PreferredBackBufferWidth;
             Height = graphics.PreferredBackBufferHeight;
-
+            
             screenManager = new ScreenManager(this);
             Components.Add(new InputManager(this));
             Components.Add(screenManager);
@@ -51,6 +55,7 @@ namespace DDDD2
             audioManager = new AudioManager(this);
             gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
+            Window.Title = "Don't Die Dateless, Dummy!";
             
         }
 
@@ -78,7 +83,7 @@ namespace DDDD2
             /*screenWidth = graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             screenHeight = graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
             screenRectangle = new Rectangle(0, 0, screenWidth, screenHeight);*/
-
+            
             base.Initialize();
         }
 
@@ -99,6 +104,8 @@ namespace DDDD2
             gameInfo.parseScenes(Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1"));
             
             audioManager.LoadContent();
+            
+            
             // TODO: use this.Content to load your game content here
         }
 
@@ -124,7 +131,6 @@ namespace DDDD2
             // TODO: exit from menu, exit from startscreen
             if (Keyboard.GetState().IsKeyDown(Keys.Escape) || startScreen.gotExit() == 1)
                 Exit();
-
             // TODO: Add your update logic here
 
             base.Update(gameTime);
