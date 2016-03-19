@@ -74,7 +74,7 @@ namespace DDDD2.GameScreens
                             break;
                         case 2:
                             Game1.audioManager.PlaySelectSound();
-                            manager.ChangeScreens(GameRef.saveLoadScreen);
+                            manager.ChangeScreens(GameRef.creditsScreen);
                             break;
                         case 4:
                             Game.Exit();

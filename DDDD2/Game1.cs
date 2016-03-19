@@ -28,11 +28,14 @@ namespace DDDD2
         public NameHeroScreen nameHeroScreen;
         public EndingScreen endingScreen;
         public SaveLoadScreen saveLoadScreen;
+        public CreditsScreen creditsScreen;
+        public Texture2D escButton;
+
         private bool steamInit;
         //TODO:
-        // check all sounds credits, ogg, console output, credits
+        // ogg, console output, delete appid
         // BUGS:
-        // If switching map while song is still fading out, volume issues, delete appid
+        // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
         //private SpriteFont font;
         public static Texture2D pointerTexture;
@@ -57,11 +60,11 @@ namespace DDDD2
             nameHeroScreen = new NameHeroScreen(this, screenManager);
             endingScreen = new EndingScreen(this, screenManager);
             saveLoadScreen = new SaveLoadScreen(this, screenManager);
+            creditsScreen = new CreditsScreen(this, screenManager);
             audioManager = new AudioManager(this);
             gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
             Window.Title = "Don't Die Dateless, Dummy!";
-            
         }
 
         public static int Height
@@ -107,7 +110,7 @@ namespace DDDD2
             //font = Content.Load<SpriteFont>("Fonts/RegularFont");
             pointerTexture = Content.Load<Texture2D>("Graphics/UI/pointer");
             gameInfo.parseScenes(Content.Load<XmlSource>("XMLContent/Scenes/XMLFile1"));
-            
+            escButton = Content.Load<Texture2D>("Graphics/UI/MenuInfo");
             audioManager.LoadContent();
             
             

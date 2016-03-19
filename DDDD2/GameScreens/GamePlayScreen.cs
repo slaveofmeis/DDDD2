@@ -278,7 +278,10 @@ namespace DDDD2.GameScreens
                 menu.Draw(Game1.spriteBatch, (int)(Game1.Height * 0.070), true);
             }
             else
+            {
                 dialogueManager.Draw(Game1.spriteBatch);
+                Game1.spriteBatch.Draw(GameRef.escButton, Vector2.Zero, Color.White);
+            }
             base.Draw(gameTime);
         }
     }
