@@ -102,7 +102,7 @@ namespace DDDD2.GameComponents
             {
                 if (transitionValue < 255)
                 {
-                    transitionValue += transitionSpeed;
+                    transitionValue += TransitionSpeed;
                     if (transitionValue >= 255)
                     {
                         transitionValue = 255;
@@ -121,7 +121,7 @@ namespace DDDD2.GameComponents
                 SwitchOK = false;
                 if (transitionValue > 0)
                 {
-                    transitionValue -= transitionSpeed;
+                    transitionValue -= TransitionSpeed;
                     if (transitionValue <= 0)
                         transitionValue = 0;
                     //transitionTexture.SetData<Color>(new Color[] { new Color(180, 255, 0, transitionValue) });
@@ -135,7 +135,7 @@ namespace DDDD2.GameComponents
             {
                 if (transitionValue < Game1.Width)
                 {
-                    transitionValue += transitionSpeed;
+                    transitionValue += TransitionSpeed;
                     transitionValue = (int)MathHelper.Clamp(transitionValue, 0, Game1.Width);
                     //transitionTexture.SetData<Color>(new Color[] { new Color(180, 255, 0, transitionValue) });
                 }
@@ -148,7 +148,7 @@ namespace DDDD2.GameComponents
             {
                 if (transitionValue < 255)
                 {
-                    transitionValue += transitionSpeed;
+                    transitionValue += TransitionSpeed;
                     if (transitionValue >= 255)
                     {
                         transitionValue = 255;

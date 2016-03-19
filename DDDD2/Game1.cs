@@ -26,18 +26,21 @@ namespace DDDD2
         public StartScreen startScreen;
         public GamePlayScreen gamePlayScreen;
         public NameHeroScreen nameHeroScreen;
+        public EndingScreen endingScreen;
+        public SaveLoadScreen saveLoadScreen;
+        private bool steamInit;
         //TODO:
-        // check all sounds credits, check no extra controls, gameplay screen menu, ENDING screen
+        // check all sounds credits, ogg, console output, credits
         // BUGS:
-        // If switching map while song is still fading out, volume issues
+        // If switching map while song is still fading out, volume issues, delete appid
         // Common stuff here TODO: put in some separate class/library
         //private SpriteFont font;
         public static Texture2D pointerTexture;
 
         public Game1()
         {
-            //bool steamInit = SteamAPI.Init();
-            //Console.WriteLine(SteamFriends.GetPersonaName());
+            steamInit = SteamAPI.Init();
+            //Console.WriteLine(SteamUser.GetSteamID().GetAccountID().m_AccountID);
             
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -52,6 +55,8 @@ namespace DDDD2
             startScreen = new StartScreen(this, screenManager);
             gamePlayScreen = new GamePlayScreen(this, screenManager);
             nameHeroScreen = new NameHeroScreen(this, screenManager);
+            endingScreen = new EndingScreen(this, screenManager);
+            saveLoadScreen = new SaveLoadScreen(this, screenManager);
             audioManager = new AudioManager(this);
             gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
@@ -129,8 +134,12 @@ namespace DDDD2
             audioManager.Update();
             //TODO gamepad GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
             // TODO: exit from menu, exit from startscreen
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) || startScreen.gotExit() == 1)
+            if (startScreen.gotExit() == 1)
+            {
+                if(steamInit)
+                    SteamAPI.Shutdown();
                 Exit();
+            }
             // TODO: Add your update logic here
 
             base.Update(gameTime);

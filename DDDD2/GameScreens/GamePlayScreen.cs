@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Input;
 using DDDD2.GameComponents;
 using DDDD2.GameInformation;
 using System.IO;
-using System.IO.IsolatedStorage;
 using Microsoft.Xna.Framework.Media;
 namespace DDDD2.GameScreens
 {
@@ -23,14 +22,21 @@ namespace DDDD2.GameScreens
         public static DialogueManager dialogueManager;
         private string currentSceneId;
         private bool gameStarted;
+        private Texture2D menuTexture;
+        private Rectangle menuRectangle;
+        private bool menuIsActivated;
+        private MenuComponent menu;
+        private SpriteFont menuFont;
+        private string[] menuItems = { "Save Game", "Load Game", "Main Menu", "Return to Game" };
         public GamePlayScreen(Game game, ScreenManager manager)
             : base(game)
         {
             Content = Game.Content;
             this.manager = manager;
             dialogueManager = new DialogueManager(game);
-            currentSceneId = "52";
+            currentSceneId = "0";
             gameStarted = false;
+            menuIsActivated = false;
         }
 
         public void setHeroName(string name)
@@ -38,9 +44,15 @@ namespace DDDD2.GameScreens
             HERO_NAME = name;
         }
 
-        private Scene CurrentScene
+        public Scene CurrentScene
         {
             get {  return Game1.gameInfo.getSceneDict()[currentSceneId]; }
+        }
+
+        public string SceneId
+        {
+            get { return currentSceneId; }
+            set { currentSceneId = value; }
         }
 
         protected override void LoadContent()
@@ -48,24 +60,40 @@ namespace DDDD2.GameScreens
             //font = Content.Load<SpriteFont>("Fonts/RegularFont");
             dialogueManager.LoadContent();
             gameStarted = true;
+            menuFont = Content.Load<SpriteFont>("Fonts/RegularFont");
+            menuTexture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            menuTexture.SetData<Color>(new Color[] { new Color(0, 0, 0, 140) });
+            menu = new MenuComponent(menuFont, 0);
+            menuRectangle = new Rectangle(0, 0, Game1.Width, Game1.Height);
+            
+            menu.SetMenuItems(menuItems.ToList<String>());
+            Vector2 menuPosition = new Vector2((float)(Game1.Width / 2 - menu.Width / 2), (float)(Game1.Height / 2 - menu.Height / 2));
+            menu.SetPosition(menuPosition);
             LoadScene();
             base.LoadContent();
         }
 
-        private void prepNewGame()
+        public void prepNewGame()
         {
             Game1.gameInfo.resetStats();
             gameStarted = false;
             currentSceneId = "0";
+            dialogueManager.ClearDialogueManager();
+        }
+
+        public void prepLoadedGame()
+        {
+            gameStarted = false;
+            dialogueManager.ClearDialogueManager();
         }
 
         private void handleTransition()
         {
             if (currentSceneId.Contains("WC") || currentSceneId.Contains("LC"))
             {
-                prepNewGame();
-                Game1.audioManager.fadeMeOut();
-                manager.ChangeScreens(GameRef.startScreen);
+                //prepNewGame();
+                //Game1.audioManager.fadeMeOut();
+                manager.ChangeScreens(GameRef.endingScreen);
             }
             else
                 LoadScene();
@@ -87,102 +115,84 @@ namespace DDDD2.GameScreens
             
             if (screenFader.IsFadeOut == false && screenFader.IsFadeIn == false && !Game1.audioManager.audioTransitioning())
             {
-                dialogueManager.Update(gameTime);
-                if (dialogueManager.DialogueList.Count == 0 && !dialogueManager.hasJobsLeft())
+                if (InputManager.KeyReleased(Keys.Escape) && dialogueManager.DialogueList.Count != 0 && dialogueManager.hasJobsLeft())
                 {
-                    string savedBackground = CurrentScene.Background;
-                    // Based on the last dialogue job, see what the next scene is
-                    if (dialogueManager.DialogueType == DialogueManager.DialogueEnum.Choice)
+                    menuIsActivated = !menuIsActivated;
+                    menu.SelectedIndex = 0;
+
+                }
+                if (!menuIsActivated)
+                {
+                    dialogueManager.Update(gameTime);
+                    if (dialogueManager.DialogueList.Count == 0 && !dialogueManager.hasJobsLeft())
                     {
-                        Game1.audioManager.PlaySelectSound();
-                        currentSceneId = dialogueManager.ChoiceValues[dialogueManager.ChoiceMenu.SelectedIndex];
-                        dialogueManager.ClearChoices();
-                    }
-                    else if (dialogueManager.DialogueType == DialogueManager.DialogueEnum.Normal || dialogueManager.DialogueType == DialogueManager.DialogueEnum.Attribute)
-                    {
-                        UpdateAttributes();
-                        if (!CurrentScene.AttributeFork.Equals(""))
+                        string savedBackground = CurrentScene.Background;
+                        // Based on the last dialogue job, see what the next scene is
+                        if (dialogueManager.DialogueType == DialogueManager.DialogueEnum.Choice)
                         {
-                            HandleAttributeFork();
+                            Game1.audioManager.PlaySelectSound();
+                            currentSceneId = dialogueManager.ChoiceValues[dialogueManager.ChoiceMenu.SelectedIndex];
+                            dialogueManager.ClearChoices();
                         }
-                        else
+                        else if (dialogueManager.DialogueType == DialogueManager.DialogueEnum.Normal || dialogueManager.DialogueType == DialogueManager.DialogueEnum.Attribute)
                         {
-                            currentSceneId = CurrentScene.NextScene;
+                            UpdateAttributes();
+                            if (!CurrentScene.AttributeFork.Equals(""))
+                            {
+                                HandleAttributeFork();
+                            }
+                            else
+                            {
+                                currentSceneId = CurrentScene.NextScene;
+                            }
                         }
-                    }
-                    if (!currentSceneId.Contains("WC") && !currentSceneId.Contains("LC"))
-                    {
-                        if (savedBackground.Equals(CurrentScene.Background))
+                        if (!currentSceneId.Contains("WC") && !currentSceneId.Contains("LC"))
                         {
-                            handleTransition();
+                            if (savedBackground.Equals(CurrentScene.Background))
+                            {
+                                handleTransition();
+                            }
+                            else
+                                screenFader.IsFadeOut = true;
                         }
                         else
                             screenFader.IsFadeOut = true;
                     }
-                    else
-                        screenFader.IsFadeOut = true;
                 }
-                if (InputManager.KeyReleased(Keys.G))
+                else
                 {
-                    SaveGame();
-                }
-                if (InputManager.KeyReleased(Keys.H))
-                {
-                    LoadGame();
-                }
-                if (InputManager.KeyReleased(Keys.V))
-                {
-                    Console.WriteLine(MediaPlayer.Volume);
-                    Console.WriteLine(MediaPlayer.State);
+                    menu.Update();
+                    if (InputManager.KeyReleased(Keys.Space))
+                    {
+                        Game1.audioManager.PlaySelectSound();
+                        switch (menu.SelectedIndex)
+                        {
+                            case 0:
+                                manager.ChangeScreens(GameRef.saveLoadScreen);
+                                GameRef.saveLoadScreen.CameFromStartScreen = false;
+                                GameRef.saveLoadScreen.IsSave = true;
+                                break;
+                            case 1:
+                                manager.ChangeScreens(GameRef.saveLoadScreen);
+                                GameRef.saveLoadScreen.CameFromStartScreen = false;
+                                GameRef.saveLoadScreen.IsSave = false;
+                                break;
+                            case 2:
+                                menuIsActivated = false;
+                                manager.ChangeScreens(GameRef.startScreen);
+                                break;
+                            case 3:
+                                menuIsActivated = false;
+                                break;
+
+                        }
+                    }
                 }
             }
             base.Update(gameTime);
         }
 
-        private void SaveGame()
-        {
-            string filename = "test.dat";
-            FileStream stream=File.Open(filename, FileMode.OpenOrCreate); 
-            StreamWriter writeStream= new StreamWriter(stream);
-            try
-            {
-                writeStream.WriteLine("ABC");
-            }
-            finally
-            {
-                // Close the file
-                writeStream.Flush();
-                writeStream.Close();
-                stream.Close();
-            }
-            
-        }
-
-        public void LoadGame()
-        {
-            string filename = "test.dat";
-            if (System.IO.File.Exists(filename))
-            {
-                FileStream stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.Read);
-                // create a reader to the stream...
-                StreamReader readStream = new StreamReader(stream);
-                try
-                {
-                    Console.WriteLine(readStream.ReadLine());
-                }
-                finally
-                {
-                    // Tidy up by closing the streams...
-                    readStream.Close();
-                    stream.Close();
-                }
-            }
-            else
-            {
-                // BUZZ
-            }
-
-        }
+        
     
 
     private void HandleAttributeFork()
@@ -222,7 +232,7 @@ namespace DDDD2.GameScreens
 
         private void LoadScene()
         {
-            Console.WriteLine("Loading scene: " + currentSceneId);
+            //Console.WriteLine("Loading scene: " + currentSceneId);
             background = new BackgroundComponent(
             GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/" + CurrentScene.Background),
             DrawMode.Fill);
@@ -238,7 +248,7 @@ namespace DDDD2.GameScreens
             if (!CurrentScene.Music.Equals(""))
             {
                 Game1.audioManager.PlayMapSwitch(CurrentScene.Music);
-                Console.WriteLine("Playing: " + CurrentScene.Music);
+                //Console.WriteLine("Playing: " + CurrentScene.Music);
             }
             else
             {
@@ -251,7 +261,7 @@ namespace DDDD2.GameScreens
             else
                 spriteTexture = null;
             gameStarted = true;
-
+            menuIsActivated = false;
         }
 
         public override void Draw(GameTime gameTime)
@@ -261,7 +271,14 @@ namespace DDDD2.GameScreens
             {
                 Game1.spriteBatch.Draw(spriteTexture, Vector2.Zero, Color.White);
             }
-            dialogueManager.Draw(Game1.spriteBatch);
+            //dialogueManager.Draw(Game1.spriteBatch);
+            if (menuIsActivated)
+            {
+                Game1.spriteBatch.Draw(menuTexture, menuRectangle, Color.White);
+                menu.Draw(Game1.spriteBatch, (int)(Game1.Height * 0.070), true);
+            }
+            else
+                dialogueManager.Draw(Game1.spriteBatch);
             base.Draw(gameTime);
         }
     }

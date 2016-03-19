@@ -33,7 +33,7 @@ namespace DDDD2.GameComponents
         private int PORTRAITHEIGHT;
         private int PORTRAITWIDTH;
         private int NARRATIONPOSY;
-
+        private Vector2 choiceMenuPosition;
         private const int SCROLL_SPEED = 0;
         private int portraitPosX, portraitPosY, textPosX, textPosY,
             identifierPosX, identifierPosY;
@@ -45,7 +45,7 @@ namespace DDDD2.GameComponents
         private List<string> choiceValues;
         public enum DialogueEnum {  Normal, Attribute, Choice };
         Game myGame;
-        Texture2D dialogueTexture, altDialogueTexture;
+        private Texture2D dialogueTexture, altDialogueTexture;
         //Texture2D portraitBorderTexture, portraitTexture, dialogueTexture, dialogueBorderTexture;
         public DialogueManager(Game game)
             : base(game)
@@ -141,6 +141,7 @@ namespace DDDD2.GameComponents
             altDialogueTexture.SetData<Color>(new Color[] { new Color(0, 0, 0, 140) });
             dialogueRectangle = new Rectangle(DIALOGUEPOSX, DIALOGUEPOSY, DIALOGUEWIDTH, DIALOGUEHEIGHT);
             narrationDialogueRectangle = new Rectangle(DIALOGUEPOSX, (int)(Game1.Height * 0.10), DIALOGUEWIDTH, (int)(Game1.Height * 0.80));
+            choiceMenuPosition = new Vector2(textPosX + 4 * TEXTPADDING, textPosY + (int)dialogueFont.MeasureString("").Y + TEXTPADDING);
             //portraitRectangle = new Rectangle(portraitPosX, portraitPosY, PORTRAITWIDTH, PORTRAITHEIGHT);
         }
 
@@ -150,19 +151,27 @@ namespace DDDD2.GameComponents
             ChoiceMenu.MenuItems.Clear();
             ChoiceMenu.SelectedIndex = 0;
         }
+
+        public void ClearDialogueManager()
+        {
+            if(ChoiceMenu != null)
+                ClearChoices();
+            dialogueQueue.Clear();
+            dialogue.Clear();
+            identifier = "";
+            tempString = "";
+            shownString = "";
+            drawDialogue = false;
+            drawPortrait = false;
+            scrollFinished = false;
+            updateLock = false;
+    }
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            if (ChoiceMenu.MenuItems.Count != 0)
-            {
-                identifier = "[Choice]";
-                ChoiceMenu.Update();
-                ChoiceMenu.SetPosition(new Vector2(textPosX + 4*TEXTPADDING, textPosY + (int)dialogueFont.MeasureString(dialogue[0]).Y + TEXTPADDING));
-                ChoiceMenu.IsVisible = true;
-            }
             // TODO: Add your update code here
             if(dialogueQueue.Count != 0 && dialogue.Count == 0)
             {
@@ -191,6 +200,18 @@ namespace DDDD2.GameComponents
                     ChoiceMenu.SetMenuItems(choiceText);
                 }
             }
+            if (ChoiceMenu.MenuItems.Count != 0)
+            {
+                identifier = "[Choice]";
+                // This position will give you trouble if the ChoiceText exceeds one line
+                ChoiceMenu.SetPosition(choiceMenuPosition);
+                ChoiceMenu.IsVisible = true;
+                ChoiceMenu.Update();
+            }
+            else
+            {
+                ClearChoices();
+            }
             if (dialogue.Count != 0)
             {
                 /*if (!scrollWatch.IsRunning)
@@ -207,14 +228,21 @@ namespace DDDD2.GameComponents
                 {
                     if (DialogueType == DialogueEnum.Attribute || DialogueType == DialogueEnum.Choice) //no scrolling
                     {
-                        if (DialogueType == DialogueEnum.Attribute && !dialogue[0].Contains("Affection")) // Affection is a hidden stat gain
+                        if (DialogueType == DialogueEnum.Attribute) // Affection is a hidden stat gain
                         {
-                            shownString = "Gained " + dialogue[0].Trim() + "!";
-                            Game1.audioManager.PlayPositiveSound();
+                            if (!dialogue[0].Contains("Affection"))
+                            {
+                                shownString = "Gained " + dialogue[0].Trim() + "!";
+                                Game1.audioManager.PlayPositiveSound();
+                                dialogue[0] = "";
+                            }
+                            else
+                            {
+                                dialogue.RemoveAt(0);
+                            }
 
                         }
-                        else { shownString = dialogue[0].Trim(); }
-                        dialogue[0] = "";
+                        else { shownString = dialogue[0].Trim(); dialogue[0] = ""; }
                     }
                     else // scrolling
                     { 
@@ -254,7 +282,7 @@ namespace DDDD2.GameComponents
                     }
                 }
             }
-            if (dialogue.Count == 0)
+            if (dialogueQueue.Count == 0 && dialogue.Count == 0)
             {
                 drawDialogue = false;
             }
@@ -357,11 +385,13 @@ namespace DDDD2.GameComponents
                         }
                         else if (identifier.Equals("[Choice]"))
                         {
-                            Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
-                            Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX, identifierPosY + TEXTPADDING), Color.White);
                             if (ChoiceMenu.MenuItems.Count != 0 && ChoiceMenu.IsVisible)
+                            {
+                                Game1.spriteBatch.Draw(dialogueTexture, dialogueRectangle, Color.White);
+                                Game1.spriteBatch.DrawString(dialogueFont, shownString, new Vector2(identifierPosX, identifierPosY + TEXTPADDING), Color.White);
                                 ChoiceMenu.Draw(Game1.spriteBatch, TEXTPADDING * 4, true);
-                    }
+                            }
+                        }
                         else if (identifier.Equals("[End]"))
                         {
                             Game1.spriteBatch.Draw(altDialogueTexture, dialogueRectangle, Color.White);

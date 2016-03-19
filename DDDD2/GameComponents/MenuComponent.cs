@@ -27,6 +27,7 @@ namespace DDDD2.GameComponents
         protected bool highlight;
         protected Vector2 position;
         protected SpriteFont spriteFont;
+        protected float fontCharHeight;
         public Color NormalColor
         {
             get;
@@ -104,6 +105,7 @@ namespace DDDD2.GameComponents
         public MenuComponent(SpriteFont spriteFont, int menuStatus)
         {
             this.spriteFont = spriteFont;
+            fontCharHeight = spriteFont.MeasureString("W").Y;
             NormalColor = Color.White;
             HiliteColor = Color.Yellow;
             UnusableColor = Color.DarkGray;
@@ -176,24 +178,30 @@ namespace DDDD2.GameComponents
             //if (InputManager.KeyReleased(Keys.B) || InputManager.KeyReleased(Keys.Escape)) //|| InputManager.ButtonReleased(LogicalGamer.GetPlayerIndex(LogicalGamerIndex.One), Buttons.B))
                     //Game1.audioManager.PlayBackSound();
         }
-        public virtual void Draw(SpriteBatch spriteBatch, int lineSpacing, bool alwaysHighlight)
+        public virtual void Draw(SpriteBatch spriteBatch, int lineSpacing, bool alwaysHighlight, bool drawPointer = true)
         {
-            Vector2 menuPosition = position;
-            highlight = alwaysHighlight;
-
-            for (int i = 0; i < menuItems.Count; i++)
+            //Vector2 menuPosition = Vector2.Zero;
+            if (IsVisible)
             {
-                // TODO: revisit hero name
-                //string shownString = menuItems[i];
-                string shownString = menuItems[i].Replace(GamePlayScreen.MC_IDENTIFIER, GamePlayScreen.HERO_NAME);
-                if (i == selectedIndex && (hasFocus == true || highlight == true))
-                    spriteBatch.DrawString(spriteFont, shownString, menuPosition, HiliteColor);
-                else
-                    spriteBatch.DrawString(spriteFont, shownString, menuPosition, NormalColor);
-                menuPosition.Y += lineSpacing;
+                
+                Vector2 menuPosition = position;
+                highlight = alwaysHighlight;
+
+                for (int i = 0; i < menuItems.Count; i++)
+                {
+                    // TODO: revisit hero name
+                    //string shownString = menuItems[i];
+                    string shownString = menuItems[i].Replace(GamePlayScreen.MC_IDENTIFIER, GamePlayScreen.HERO_NAME);
+                    if (i == selectedIndex && (hasFocus == true || highlight == true))
+                        spriteBatch.DrawString(spriteFont, shownString, menuPosition, HiliteColor);
+                    else
+                        spriteBatch.DrawString(spriteFont, shownString, menuPosition, NormalColor);
+                    menuPosition.Y += lineSpacing;
+                }
+
+                if (HasFocus && drawPointer)
+                    spriteBatch.Draw(Game1.pointerTexture, new Vector2(position.X - (Game1.Width / 41), (position.Y + fontCharHeight / 2) + selectedIndex * lineSpacing), Color.White);
             }
-            if (HasFocus)
-                spriteBatch.Draw(Game1.pointerTexture, new Vector2(position.X - 25, (position.Y + lineSpacing/3) + selectedIndex * lineSpacing), Color.White);
         }
         #endregion
     }

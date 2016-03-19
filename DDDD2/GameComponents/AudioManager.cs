@@ -20,23 +20,21 @@ namespace DDDD2.GameComponents
         public float maxVolumeSetting;
         private const string NAVIGATION = "Sounds/sf3_sfx_menu_select";
         private const string SELECT = "Sounds/29929__DJ_Chronos__Menu_Nav_3-2";
-        private const string BACK = "Sounds/sf3_sfx_menu_back";
+       // private const string BACK = "Sounds/sf3_sfx_menu_back";
         private const string BUZZ = "Sounds/107871__awfulTHEsample__noizz7";
         private const string POSITIVE = "Sounds/sf3_sfx_menu_validate";
-        private const string EQUIP = "Sounds/21693__ice9ine__light_switch";
-        private const string CLICK = "Sounds/113218__satrebor__click";
+        //private const string EQUIP = "Sounds/21693__ice9ine__light_switch";
+        //private const string CLICK = "Sounds/113218__satrebor__click";
         private const string CACHING = "Sounds/91924__Benboncan__Till_With_Bell";
        
 
         private List<SoundEffectInstance> soundList;
         private Song mySong;
         // Battle Related
-        private SoundEffectInstance myBattleSong, randEncSound, battleWonSound,
-            bossBattleSong, regularBattleSong;
 
         Game myGame;
         string currentSong, nextMapSong;
-        private bool isTransitioning, isFadeOut, isPausing, isSwitchingMap;
+        private bool isTransitioning, isFadeOut, isPausing, isSwitchingMap, isFadeOutSlow;
         private float fakeVolume;
         private Dictionary<SoundEffectInstance, bool> fadeOutSounds;
         //private Dictionary<string, SoundEffectInstance> eventSoundsDict;
@@ -48,6 +46,7 @@ namespace DDDD2.GameComponents
             nextMapSong = "";
             isTransitioning = false;
             isFadeOut = false;
+            isFadeOutSlow = false;
             isPausing = false;
             isSwitchingMap = false;
             fakeVolume = 0;
@@ -59,7 +58,7 @@ namespace DDDD2.GameComponents
 
         public bool audioTransitioning()
         {
-            return (isTransitioning || isFadeOut || isPausing || isSwitchingMap);
+            return (isTransitioning || isFadeOut || isPausing || isSwitchingMap || isFadeOutSlow);
         }
 
         public void incrementMaxVolume()
@@ -118,6 +117,10 @@ namespace DDDD2.GameComponents
                 MediaPlayer.IsRepeating = true;
                 MediaPlayer.Play(mySong);
                 fakeVolume = 0f;
+                isFadeOut = false;
+                isPausing = false;
+                isSwitchingMap = false;
+                isFadeOutSlow = false;
                 isTransitioning = true;
             }
             currentSong = "Music/" + songToPlay;
@@ -216,14 +219,6 @@ namespace DDDD2.GameComponents
         {
             PlayStaticSound(SELECT);
         }
-        public void PlayBackSound()
-        {
-            PlayStaticSound(BACK);
-        }
-        public void PlayEquipSound()
-        {
-            PlayStaticSound(EQUIP);
-        }
         public void PlayPositiveSound()
         {
             PlayStaticSound(POSITIVE);
@@ -232,10 +227,19 @@ namespace DDDD2.GameComponents
         {
             PlayStaticSound(BUZZ);
         }
+        /*
+        public void PlayBackSound()
+        {
+            PlayStaticSound(BACK);
+        }
+        public void PlayEquipSound()
+        {
+            PlayStaticSound(EQUIP);
+        }
         public void PlayClickSound()
         {
             PlayStaticSound(CLICK);
-        }
+        }*/
         public void PlayCaChingSound()
         {
             PlayStaticSound(CACHING);
@@ -275,6 +279,11 @@ namespace DDDD2.GameComponents
         public void fadeMeOut()
         {
             isFadeOut = true;
+        }
+
+        public void fadeMeOutSlow()
+        {
+            isFadeOutSlow = true;
         }
 
         private void CheckFadeOutSongs()
@@ -367,6 +376,22 @@ namespace DDDD2.GameComponents
                     currentSong = "";
                     MediaPlayer.Stop();
                     isFadeOut = false;
+                }
+            }
+            // TODO: should just pass in what CREMENT you want from a method and set it instead of hardcoding here and having two isFadeOut 
+            else if (isFadeOutSlow)
+            {
+                if ((fakeVolume - CREMENT_VALUE/10) > 0)
+                {
+                    MediaPlayer.Volume -= CREMENT_VALUE/7;
+                    fakeVolume -= CREMENT_VALUE/7;
+                }
+                else
+                {
+                    MediaPlayer.Volume = 0;
+                    currentSong = "";
+                    MediaPlayer.Stop();
+                    isFadeOutSlow = false;
                 }
             }
             else if (isPausing)

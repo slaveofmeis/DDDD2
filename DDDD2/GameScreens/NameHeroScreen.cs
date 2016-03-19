@@ -77,12 +77,15 @@ namespace DDDD2.GameScreens
                             shownName = shownName.Substring(0, shownName.Length - 1);
                             Game1.audioManager.PlaySelectSound();
                         }
+                        else
+                            Game1.audioManager.PlayBuzzSound();
                     }
                     else if (menuItems[menu.SelectedIndex].Contains("DONE"))
                     {
                         GameRef.gamePlayScreen.setHeroName(shownName);
                         Game1.audioManager.PlaySelectSound();
                         //Game1.audioManager.fadeMeOut();
+                        GameRef.gamePlayScreen.prepNewGame();
                         manager.ChangeScreens(GameRef.gamePlayScreen);
                     }
                     else
@@ -110,7 +113,7 @@ namespace DDDD2.GameScreens
         {
             background.Draw(Game1.spriteBatch);
             //Game1.spriteBatch.DrawString(font, "StartScreen", new Vector2(100,100), Color.Yellow);
-            menu.Draw(Game1.spriteBatch, (int)(Game1.Height * 0.060), true);
+            menu.Draw(Game1.spriteBatch, (int)(Game1.Height * 0.060), true, false);
             Game1.spriteBatch.DrawString(font, shownName, shownNamePosition, Color.White);
             base.Draw(gameTime);
         }

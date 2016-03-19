@@ -22,11 +22,12 @@ namespace DDDD2.GameScreens
         {
             Content = Game.Content;
             this.manager = manager;
+            
         }
 
         protected override void LoadContent()
         {
-            font = Content.Load<SpriteFont>("Fonts/dialogueFont");
+            font = Content.Load<SpriteFont>("Fonts/RegularFont");
             background = new BackgroundComponent(
             GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/StartScreen"),
             DrawMode.Fill);
@@ -38,8 +39,9 @@ namespace DDDD2.GameScreens
             
 
             menu = new MenuComponent(font, 0);
-            Vector2 menuPosition = new Vector2((float)((Game1.Width - menu.Width) *0.31),(float)((Game1.Height - menu.Height)*0.61));
+            Vector2 menuPosition = new Vector2((float)((Game1.Width - menu.Width) *0.315),(float)((Game1.Height - menu.Height)*0.57));
             menu.SetPosition(menuPosition);
+            menu.SetMenuItems(menuItems.ToList<String>());
             base.LoadContent();
         }
 
@@ -47,8 +49,8 @@ namespace DDDD2.GameScreens
 
         public override void Update(GameTime gameTime)
         {
-            menu.SetMenuItems(menuItems.ToList<String>());
-            if (!screenFader.IsFadeIn && !screenFader.IsFadeOut && !Game1.audioManager.audioTransitioning())
+            //menu.SetMenuItems(menuItems.ToList<String>());
+            if (!screenFader.IsFadeIn && !screenFader.IsFadeOut) // && !Game1.audioManager.audioTransitioning())
             {
                 Game1.audioManager.Play("CasualBGM");
                 menu.Update();
@@ -64,19 +66,20 @@ namespace DDDD2.GameScreens
                             //manager.ChangeScreens(GameRef.nameHeroScreen);
                             break;
                         case 1:
-                            
-                            //GameRef.saveLoadScreen.ClearFlag = true;
-                            //GameRef.saveLoadScreen.SaveContext = false;
-                            //GameRef.saveLoadScreen.StartScreenContext = true;
                             Game1.audioManager.PlaySelectSound();
-                            manager.ChangeScreens(GameRef.gamePlayScreen);
-                            //manager.ChangeScreens(GameRef.saveLoadScreen);
+                            GameRef.saveLoadScreen.IsSave = false;
+                            GameRef.saveLoadScreen.CameFromStartScreen = true;
+                            manager.ChangeScreens(GameRef.saveLoadScreen);
 
+                            break;
+                        case 2:
+                            Game1.audioManager.PlaySelectSound();
+                            manager.ChangeScreens(GameRef.saveLoadScreen);
                             break;
                         case 4:
                             Game.Exit();
                             break;
-                        
+
                     }
                 }
                 if (InputManager.KeyReleased(Keys.Left) && menu.SelectedIndex == 3)
@@ -91,7 +94,6 @@ namespace DDDD2.GameScreens
                     //Console.WriteLine(Game1.audioManager.maxVolumeSetting);
                     Game1.audioManager.PlayCaChingSound();
                 }
-                
             }
             
             /*if (screenFader.SwitchOK == true)
@@ -137,7 +139,7 @@ namespace DDDD2.GameScreens
         {
             background.Draw(Game1.spriteBatch);
             //Game1.spriteBatch.DrawString(font, "StartScreen", new Vector2(100,100), Color.Yellow);
-            menu.Draw(Game1.spriteBatch, (int)(Game1.Height*0.060), true);
+            menu.Draw(Game1.spriteBatch, (int)(Game1.Height*0.065), true);
             HandleSpeakerDraw();
             base.Draw(gameTime);
         }
