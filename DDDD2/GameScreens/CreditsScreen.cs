@@ -42,7 +42,7 @@ namespace DDDD2.GameScreens
             {
                 if (InputManager.KeyReleased(Keys.Space) || InputManager.KeyReleased(Keys.Escape))
                 {
-                    Game1.audioManager.fadeMeOut();
+                    //Game1.audioManager.fadeMeOut();
                     screenFader.IsFadeOut = true;
                 }
                 //manager.ChangeScreens(GameRef.startScreen);

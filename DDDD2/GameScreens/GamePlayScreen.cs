@@ -9,6 +9,7 @@ using DDDD2.GameComponents;
 using DDDD2.GameInformation;
 using System.IO;
 using Microsoft.Xna.Framework.Media;
+using Steamworks;
 namespace DDDD2.GameScreens
 {
     public class GamePlayScreen : GameScreen
@@ -98,6 +99,7 @@ namespace DDDD2.GameScreens
             else
                 LoadScene();
         }
+
 
         public override void Update(GameTime gameTime)
         {
@@ -230,9 +232,68 @@ namespace DDDD2.GameScreens
             }
         }
 
+        private void setStat(string statName)
+        {
+            if(GameRef.statsRequested)
+                SteamUserStats.SetStat(statName, 1);
+        }
+
+        private void checkStatsAchievements()
+        {
+            switch (currentSceneId)
+            {
+                case "W1":
+                    GameRef.LiaWin = 1;
+                    setStat("LiaVictory");
+                    break;
+                case "W2":
+                    GameRef.EllieWin = 1;
+                    setStat("EllieVictory");
+                    break;
+                case "W3":
+                    GameRef.VeraWin = 1;
+                    setStat("VeraVictory");
+                    break;
+                case "L1":
+                    GameRef.Lose_1 = 1;
+                    setStat("Wizard1");
+                    break;
+                case "L2":
+                    GameRef.Lose_2 = 1;
+                    setStat("Wizard2");
+                    break;
+                case "L3":
+                    GameRef.Lose_3 = 1;
+                    setStat("Wizard3");
+                    break;
+                case "L4":
+                    GameRef.Lose_4 = 1;
+                    setStat("Wizard4");
+                    break;
+                case "L5":
+                    GameRef.Lose_5 = 1;
+                    setStat("Wizard5");
+                    break;
+                case "L6":
+                    GameRef.Lose_6 = 1;
+                    setStat("Wizard6");
+                    break;
+                case "L7":
+                    GameRef.Lose_7 = 1;
+                    setStat("Wizard7");
+                    break;
+                case "L8":
+                    GameRef.Lose_8 = 1;
+                    setStat("Wizard8");
+                    break;
+            }
+        }
+
         private void LoadScene()
         {
             //Console.WriteLine("Loading scene: " + currentSceneId);
+            checkStatsAchievements();
+            GameRef.CheckAchievements();
             background = new BackgroundComponent(
             GameRef, Content.Load<Texture2D>("Graphics/Backgrounds/" + CurrentScene.Background),
             DrawMode.Fill);

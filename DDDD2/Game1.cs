@@ -31,9 +31,14 @@ namespace DDDD2
         public CreditsScreen creditsScreen;
         public Texture2D escButton;
 
-        private bool steamInit;
+        public bool steamInit;
+        public bool statsRequested = false;
+        public bool statsReceived = false;
+        public int VeraWin, EllieWin, LiaWin, Lose_1, Lose_2, Lose_3, Lose_4, Lose_5, Lose_6, Lose_7, Lose_8;
+        public Callback<UserStatsReceived_t> m_UserStatsReceived;
+        protected Callback<UserStatsStored_t> m_UserStatsStored;
         //TODO:
-        // ogg, console output, delete appid
+        // console output, delete appid
         // BUGS:
         // If switching map while song is still fading out, volume issues
         // Common stuff here TODO: put in some separate class/library
@@ -44,6 +49,13 @@ namespace DDDD2
         {
             steamInit = SteamAPI.Init();
             //Console.WriteLine(SteamUser.GetSteamID().GetAccountID().m_AccountID);
+            if (steamInit)
+            {
+                m_UserStatsReceived = Callback<UserStatsReceived_t>.Create(OnUserStatsReceived);
+                m_UserStatsStored = Callback<UserStatsStored_t>.Create(OnUserStatsStored);
+                statsRequested = SteamUserStats.RequestCurrentStats();
+            }
+            VeraWin = 0; EllieWin = 0; LiaWin = 0; Lose_1 = 0; Lose_2 = 0; Lose_3 = 0; Lose_4 = 0; Lose_5 = 0; Lose_6 = 0; Lose_7 = 0; Lose_8 = 0;
             
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -65,6 +77,16 @@ namespace DDDD2
             gameInfo = new GameInfo();
             screenManager.ChangeScreens(startScreen);
             Window.Title = "Don't Die Dateless, Dummy!";
+            LoadSteamStats();
+        }
+        
+        private void OnUserStatsReceived(UserStatsReceived_t pCallback)
+        {
+            //Console.WriteLine("[" + UserStatsReceived_t.k_iCallback + " - UserStatsReceived] - " + pCallback.m_nGameID + " -- " + pCallback.m_eResult + " -- " + pCallback.m_steamIDUser);
+        }
+        private void OnUserStatsStored(UserStatsStored_t pCallback)
+        {
+            //Console.WriteLine("[" + UserStatsStored_t.k_iCallback + " - UserStatsStored] - " + pCallback.m_nGameID + " -- " + pCallback.m_eResult);
         }
 
         public static int Height
@@ -77,6 +99,51 @@ namespace DDDD2
         {
             get;
             set;
+        }
+
+        public void LoadSteamStats()
+        {
+            if (statsRequested)
+            {
+
+                //SteamUserStats.SetStat("VeraVictory", 1);
+                SteamUserStats.GetStat("VeraVictory", out VeraWin);
+                SteamUserStats.GetStat("LiaVictory", out LiaWin);
+                SteamUserStats.GetStat("EllieVictory", out EllieWin);
+
+                SteamUserStats.GetStat("Wizard1", out Lose_1);
+                SteamUserStats.GetStat("Wizard2", out Lose_2);
+                SteamUserStats.GetStat("Wizard3", out Lose_3);
+                SteamUserStats.GetStat("Wizard4", out Lose_4);
+                SteamUserStats.GetStat("Wizard5", out Lose_5);
+                SteamUserStats.GetStat("Wizard6", out Lose_6);
+                SteamUserStats.GetStat("Wizard7", out Lose_7);
+                SteamUserStats.GetStat("Wizard8", out Lose_8);
+            }
+        }
+
+        public void CheckAchievements()
+        {
+            if(statsRequested)
+            {
+                if(VeraWin == 1 || LiaWin == 1 || EllieWin == 1)
+                {
+                    SteamUserStats.SetAchievement("ACH_CHAD");
+                }
+                if(VeraWin == 1 && LiaWin == 1 && EllieWin == 1)
+                {
+                    SteamUserStats.SetAchievement("ACH_KING_CHAD");
+                }
+                if(Lose_1 == 1 || Lose_2 == 1 || Lose_3 == 1 || Lose_4 == 1 || Lose_5 == 1 || Lose_6 == 1 || Lose_7 == 1 || Lose_8 == 1)
+                {
+                    SteamUserStats.SetAchievement("ACH_WIZARD");
+                }
+                if (Lose_1 == 1 && Lose_2 == 1 && Lose_3 == 1 && Lose_4 == 1 && Lose_5 == 1 && Lose_6 == 1 && Lose_7 == 1 && Lose_8 == 1)
+                {
+                    SteamUserStats.SetAchievement("ACH_ARCHMAGE");
+                }
+                SteamUserStats.StoreStats();
+            }
         }
 
         /// <summary>
@@ -134,6 +201,11 @@ namespace DDDD2
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (steamInit)
+            {
+                SteamAPI.RunCallbacks();
+            }
+            
             audioManager.Update();
             //TODO gamepad GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
             // TODO: exit from menu, exit from startscreen
